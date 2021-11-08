@@ -1,0 +1,16 @@
+[Unit]
+Description=ics-dm-iot-module-rs service
+After=network-online.target aziot-identityd.service
+Wants=network-online.target aziot-identityd.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+User=iotmodule
+Group=iotmodule
+
+ExecStart=/usr/bin/ics-dm-iot-module-rs
+
+[Install]
+WantedBy=multi-user.target
