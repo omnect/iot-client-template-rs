@@ -7,5 +7,5 @@ authors = ["Joerg Zeidler <joerg.zeidler@conplement.de>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ics-dm-azure-rs = { git = "ssh://git@github.com/ICS-DeviceManagement/ics-dm-azure-rs.git", branch = "setup" }
+ics-dm-azure-rs = { git = "ssh://git@github.com/ICS-DeviceManagement/ics-dm-azure-rs.git", branch = "unsafe_wrapper" }
 serde_json = "1.0"
