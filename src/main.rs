@@ -1,7 +1,11 @@
+use env_logger::{Builder, Env};
 use ics_dm_azure_rs::*;
+use log::debug;
 use std::{thread, time};
 
 fn main() {
+    Builder::from_env(Env::default().default_filter_or("info")).init();
+
     let result = iot_hub_init();
     if result != 0 {
         panic!("iot_hub_init not OK!");
@@ -25,7 +29,7 @@ fn main() {
 
     match set_module_twin_callback(handle) {
         Ok(()) => {
-            println!("set twin callback successfully");
+            debug!("set twin callback successfully");
         }
         Err(e) => {
             panic!("{}", e);
