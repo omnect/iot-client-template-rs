@@ -17,7 +17,6 @@ fn main() -> Result<(), String> {
 
     loop {
         do_work(handle);
-        let hundred_millis = time::Duration::from_millis(100);
-        thread::sleep(hundred_millis);
+        thread::sleep(time::Duration::from_millis(100));
     }
 }
