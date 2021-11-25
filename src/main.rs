@@ -1,5 +1,5 @@
 use env_logger::{Builder, Env};
-use ics_dm_azure_rs::*;
+use ics_dm_azure::*;
 use log::debug;
 use std::{thread, time};
 
