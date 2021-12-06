@@ -7,8 +7,8 @@ Wants=network-online.target aziot-identityd.service
 Type=simple
 Restart=always
 RestartSec=5
-User=iotmodule
-Group=iotmodule
+User=iotmodule-rs
+Group=iotmodule-rs
 
 ExecStart=/usr/bin/ics-dm-iot-module-rs
 
