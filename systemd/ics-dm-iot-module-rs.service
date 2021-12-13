@@ -2,6 +2,8 @@
 Description=ics-dm-iot-module-rs service
 After=network-online.target aziot-identityd.service
 Wants=network-online.target aziot-identityd.service
+StartLimitBurst=10
+StartLimitIntervalSec=120
 
 [Service]
 Type=simple
