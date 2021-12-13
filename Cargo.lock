@@ -165,21 +165,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9a3a5bfb195931eeb336b2a7b4d761daec841b97f947d34394601737a7bba5e4"
 
 [[package]]
-name = "ics-dm-azure-rs"
+name = "ics-dm-azure"
 version = "0.1.0"
-source = "git+ssh://git@github.com/ICS-DeviceManagement/ics-dm-azure-rs.git?branch=unsafe_wrapper#868dcc5b896c4f6d073fb8fd93e3ea9e73dbeaa5"
+source = "git+ssh://git@github.com/ICS-DeviceManagement/ics-dm-azure-rs.git?branch=main#12c33dfa1d7a9101277177a398e83167c1b41174"
 dependencies = [
- "libics-dm-azure-sys",
+ "ics-dm-azure-sys",
  "log",
  "serde_json",
 ]
 
 [[package]]
-name = "ics-dm-iot-module-rs"
+name = "ics-dm-azure-sys"
 version = "0.1.0"
+source = "git+ssh://git@github.com/ICS-DeviceManagement/ics-dm-azure-sys-rs.git?branch=main#9b51db374ba4b81123445c62a32ce299dd82da8a"
+dependencies = [
+ "bindgen",
+ "glob",
+]
+
+[[package]]
+name = "ics-dm-iot-module-rs"
+version = "0.1.2"
 dependencies = [
  "env_logger 0.8.4",
- "ics-dm-azure-rs",
+ "ics-dm-azure",
  "log",
  "serde_json",
 ]
@@ -207,15 +216,6 @@ name = "libc"
 version = "0.2.107"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fbe5e23404da5b4f555ef85ebed98fb4083e55a00c317800bc2a50ede9f3d219"
-
-[[package]]
-name = "libics-dm-azure-sys"
-version = "0.1.0"
-source = "git+ssh://git@github.com/ICS-DeviceManagement/libics-dm-azure-sys.git?branch=setup#9cb2fff88457e4d0608e660034023773fa4a2cc2"
-dependencies = [
- "bindgen",
- "glob",
-]
 
 [[package]]
 name = "libloading"
