@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.3] Q4 2021
  - add restart limit for system service file
+ - restart failed "ics-dm-iot-module-rs service" after 10 min
 
 ## [0.1.2] Q4 2021
  - set repository in Cargo.toml (enables cargo-bitbake to generate yocto recipe)

@@ -1,0 +1,8 @@
+[Unit]
+Description=Restart ics-dm-iot-module-rs
+
+[Timer]
+OnUnitInactiveSec=10min
+
+[Install]
+WantedBy=timers.target
