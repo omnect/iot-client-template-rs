@@ -1,22 +1,17 @@
 use env_logger::{Builder, Env};
-use ics_dm_azure::*;
-use log::debug;
-use std::{thread, time};
+use log::error;
+use std::process;
 
-fn main() -> Result<(), String> {
-    Builder::from_env(Env::default().default_filter_or("info")).init();
+fn main() {
+    if cfg!(debug_assertions) {
+        Builder::from_env(Env::default().default_filter_or("debug")).init();
+    } else {
+        Builder::from_env(Env::default().default_filter_or("info")).init();
+    }
 
-    iot_hub_init()?;
-    debug!("iot_hub_init successfully");
+    if let Err(e) = ics_dm_iot_module_rs::run() {
+        error!("Application error: {}", e);
 
-    let connection = get_connection_info_from_identity_service()?;
-    let handle = create_from_connection_string(connection)?;
-
-    set_module_twin_callback(handle)?;
-    debug!("set twin callback successfully");
-
-    loop {
-        do_work(handle);
-        thread::sleep(time::Duration::from_millis(100));
+        process::exit(1);
     }
 }

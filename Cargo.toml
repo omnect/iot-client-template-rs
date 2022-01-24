@@ -1,14 +1,15 @@
 [package]
 name = "ics-dm-iot-module-rs"
-version = "0.1.3"
+version = "0.2.0"
 edition = "2018"
-authors = ["Joerg Zeidler <joerg.zeidler@conplement.de>"]
-repository = "git@github.com:ICS-DeviceManagement/ics-dm-iot-module-rs.git"
+authors = ["Joerg Zeidler <joerg.zeidler@conplement.de>", "Jan Zachmann <jan.zachmann@conplement.de>"]
+repository = "git@github.com:JanZachmanncr/ics-dm-iot-module-rs.git"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ics-dm-azure = { git = "ssh://git@github.com/ICS-DeviceManagement/ics-dm-azure-rs.git", branch = "main" }
+ics-dm-azure = { path = "../ics-dm-azure-rs" }
+# ics-dm-azure = { git = "ssh://git@github.com/JanZachmann/ics-dm-azure-rs.git", branch = "refactor" }
 serde_json = "1.0"
 env_logger = "0.8"
 log = "0.4"
