@@ -755,6 +755,7 @@ dependencies = [
 [[package]]
 name = "ics-dm-azure"
 version = "0.3.0"
+source = "git+ssh://git@github.com/JanZachmann/ics-dm-azure-rs.git?branch=refactor#7329afb83633079664325a3dac3a6a6e30f466c5"
 dependencies = [
  "chrono",
  "eis-utils",
