@@ -1,13 +1,13 @@
-# ics-dm-iot-module-rs
+# iot-module-template-rs
 
-## What is ics-dm-iot-module-rs?
-This `ics-dm-iot-module-rs` repository provides code to develop Rust based [Azure IoT modules](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-module-twins) for ICS_DeviceManagement. In comparison to [IoTEdge modules](https://docs.microsoft.com/en-us/azure/iot-edge/module-development?view=iotedge-2020-11) these modules are not containerized and run natively on the device. In order to develop C/C++ based IoTEdge modules for ICS_DeviceManagement refer to the [iotedge-module-template](https://github.com/ICS-DeviceManagement/iotedge-module-template) repository.
+## What is iot-module-template-rs?
+This `iot-module-template-rs` repository provides code to develop Rust based [Azure IoT modules](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-module-twins) for ICS_DeviceManagement. In comparison to [IoTEdge modules](https://docs.microsoft.com/en-us/azure/iot-edge/module-development?view=iotedge-2020-11) these modules are not containerized and run natively on the device. In order to develop C/C++ based IoTEdge modules for ICS_DeviceManagement refer to the [iotedge-module-template](https://github.com/ICS-DeviceManagement/iotedge-module-template) repository.
 
 ## Template and example code
 The [code](src/main.rs) of this template implements a very simple example which demonstrates the basic skeleton and boilerplate code necessary for initial implementation. To be able to easily check for successful module deployment the example uses module-twin functionality to report back all desired properties as reported properties. Thus you could define a desired property in the corresponding module-twin (e.g. in Azure portal or via [iot-explorer](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer)) and check if the same property is looped back as reported property afterwards.
 
 ## Platform integration
-Both of the supported ICS_DeviceManagement targets - [yocto](https://github.com/ICS-DeviceManagement/ics-dm-os) and [simulator](https://github.com/ICS-DeviceManagement/simulator) - integrate the ics-dm-iot-module-rs and serve as an example for device integration.
+Both of the supported ICS_DeviceManagement targets - [yocto](https://github.com/ICS-DeviceManagement/ics-dm-os) and [simulator](https://github.com/ICS-DeviceManagement/simulator) - integrate the iot-module-template-rs and serve as an example for device integration.
 
 ## Module identity creation in Azure iot-hub
 In order to enable the communication between module and cloud a module identity needs to be created in Azure iot-hub.

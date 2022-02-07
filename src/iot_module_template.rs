@@ -1,5 +1,5 @@
-use ics_dm_azure::client::*;
-use ics_dm_azure::message::*;
+use azure_iot_sdk::client::*;
+use azure_iot_sdk::message::*;
 use log::debug;
 use std::collections::HashMap;
 use std::error::Error;

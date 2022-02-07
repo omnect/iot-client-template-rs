@@ -1,5 +1,5 @@
 pub mod iot_module_template;
-use ics_dm_azure::client::*;
+use azure_iot_sdk::client::*;
 use iot_module_template::{IotModuleTemplate, Message};
 use log::debug;
 use serde_json::json;
@@ -10,7 +10,7 @@ use std::sync::mpsc;
 pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
-    let connection_string = Some("HostName=iothub-ics-dev.azure-devices.net;DeviceId=jza-sim1-02:42:ac:11:00:03;ModuleId=ics-dm-iot-module-rs;SharedAccessKey=D/RXxoAmc16HSTd3c1vA+sJQrS2sgo6fZhxtI4yVvQY=");
+    let connection_string = Some("add your module connection string here or use eis-utils based provisioning");
     let methods = Some(HashMap::from([
         (
             String::from("closure1"),
