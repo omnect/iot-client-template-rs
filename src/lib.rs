@@ -10,71 +10,58 @@ use std::sync::mpsc;
 pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
-    let connection_string = Some("add your module connection string here or use eis-utils based provisioning");
-    let methods = Some(HashMap::from([
-        (
-            String::from("closure1"),
-            IotModuleTemplate::make_direct_method(|_in_json| Ok(None)),
-        ),
-        (
-            String::from("closure2"),
-            IotModuleTemplate::make_direct_method(|in_json| {
-                let mut out_json = json!({
-                    "closure2": "called",
-                    "location": "nowhere"
-                });
+    let connection_string =
+        "HostName=iothub-ics-dev.azure-devices.net;DeviceId=jza-sim1-02:42:ac:11:00:03;ModuleId=ics-dm-iot-module-rs;SharedAccessKey=D/RXxoAmc16HSTd3c1vA+sJQrS2sgo6fZhxtI4yVvQY=";
 
-                out_json["in_json"] = in_json;
+    let mut methods = HashMap::<String, DirectMethod>::new();
 
-                Ok(Some(out_json))
-            }),
-        ),
-        (String::from("func1"), Box::new(func1)),
-        (String::from("func2"), Box::new(func2)),
-    ]));
+    methods.insert(
+        String::from("closure_no_param_no_result"),
+        IotModuleTemplate::make_direct_method(|_in_json| Ok(None)),
+    );
 
-    let mut t = IotModuleTemplate::new();
+    methods.insert(
+        String::from("func_params_as_result"),
+        Box::new(func_params_as_result),
+    );
 
-    t.run(connection_string, methods, tx_client2app, rx_app2client);
+    let mut template = IotModuleTemplate::new();
+
+    template.run(
+        Some(connection_string),
+        Some(methods),
+        tx_client2app,
+        rx_app2client,
+    );
 
     for msg in rx_client2app {
         match msg {
             Message::Desired(state, mut desired) => {
-                if let TwinUpdateState::Complete = state {
-                    desired = desired["desired"].to_owned();
+                if let TwinUpdateState::Partial = state {
+                    let mut map: serde_json::Map<String, serde_json::Value> =
+                        serde_json::from_value(desired).unwrap();
+
+                    map.remove("$version");
+
+                    tx_app2client
+                        .send(Message::Reported(serde_json::Value::Object(map)))
+                        .unwrap();
                 }
-
-                let mut map: serde_json::Map<String, serde_json::Value> =
-                    serde_json::from_value(desired).unwrap();
-
-                map.remove("$version");
-
-                tx_app2client
-                    .send(Message::Reported(serde_json::Value::Object(map)))
-                    .unwrap();
             }
             _ => debug!("Application received unhandled message"),
         }
     }
 
-    t.stop()
+    template.stop()
 }
 
-pub fn func1(
-    _in_json: serde_json::Value,
-) -> Result<Option<serde_json::Value>, Box<dyn Error + Send + Sync>> {
-    Ok(None)
-}
-
-pub fn func2(
+pub fn func_params_as_result(
     in_json: serde_json::Value,
 ) -> Result<Option<serde_json::Value>, Box<dyn Error + Send + Sync>> {
     let mut out_json = json!({
-        "func2": "called",
-        "location": "here"
+        "called function": "func_params_as_result",
+        "your param was": in_json
     });
-
-    out_json["in_json"] = in_json;
 
     Ok(Some(out_json))
 }
