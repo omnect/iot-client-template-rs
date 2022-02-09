@@ -1,5 +1,5 @@
 [Unit]
-Description=ics-dm-iot-module-rs service
+Description=iot-module-template-rs service
 After=network-online.target aziot-identityd.service
 Wants=network-online.target aziot-identityd.service
 StartLimitBurst=10
@@ -12,7 +12,7 @@ RestartSec=5
 User=iotmodule-rs
 Group=iotmodule-rs
 
-ExecStart=/usr/bin/ics-dm-iot-module-rs
+ExecStart=/usr/bin/iot-module-template-rs
 
 [Install]
 WantedBy=multi-user.target

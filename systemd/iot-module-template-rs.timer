@@ -1,5 +1,5 @@
 [Unit]
-Description=Restart ics-dm-iot-module-rs
+Description=Restart iot-module-template-rs
 
 [Timer]
 OnUnitInactiveSec=10min
