@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - updated to latest azure-iot-sdk
  - added module twin example
  - added direct method example
+ - Cargo.toml: added SPDX license expression
 
 ## [0.1.3] Q4 2021
  - add restart limit for system service file
