@@ -10,8 +10,10 @@ use std::sync::mpsc;
 pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
-    let connection_string =
-        "HostName=iothub-ics-dev.azure-devices.net;DeviceId=jza-sim1-02:42:ac:11:00:03;ModuleId=ics-dm-iot-module-rs;SharedAccessKey=D/RXxoAmc16HSTd3c1vA+sJQrS2sgo6fZhxtI4yVvQY=";
+    // connect via identity servcie
+    let connection_string = None;
+    // alternatively use connection string
+    // let connection_string = Some("optional connection string");
 
     let mut methods = HashMap::<String, DirectMethod>::new();
 
@@ -28,7 +30,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     let mut template = IotModuleTemplate::new();
 
     template.run(
-        Some(connection_string),
+        connection_string,
         Some(methods),
         tx_client2app,
         rx_app2client,
@@ -36,7 +38,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     for msg in rx_client2app {
         match msg {
-            Message::Desired(state, mut desired) => {
+            Message::Desired(state, desired) => {
                 if let TwinUpdateState::Partial = state {
                     let mut map: serde_json::Map<String, serde_json::Value> =
                         serde_json::from_value(desired).unwrap();
@@ -58,7 +60,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
 pub fn func_params_as_result(
     in_json: serde_json::Value,
 ) -> Result<Option<serde_json::Value>, Box<dyn Error + Send + Sync>> {
-    let mut out_json = json!({
+    let out_json = json!({
         "called function": "func_params_as_result",
         "your param was": in_json
     });
