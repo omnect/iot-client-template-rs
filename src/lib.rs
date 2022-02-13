@@ -25,22 +25,30 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     let tx_closure = Arc::clone(&tx_app2client);
 
     methods.insert(
-        String::from("closure_no_param_no_result"),
+        String::from("closure_send_d2c_message"),
         IotModuleTemplate::make_direct_method(move |_in_json| {
-
             let msg = IotMessage::builder()
-                .set_body(serde_json::to_vec("{ \"my telemetry message\": \"mtm\" }").unwrap())
-                .set_message_id(String::from("my msg id"))
+                .set_body(serde_json::to_vec("{ \"my telemetry message\": \"hi from device\" }").unwrap())
+                .set_id(String::from("my msg id"))
                 .set_correlation_id(String::from("my correleation id"))
+                .set_property(
+                    String::from("my property key"),
+                    String::from("my property value"),
+                )
+                .set_output_queue(String::from("my output queue"))
                 .build();
 
-            tx_closure.lock().unwrap().send(Message::Telemetry(msg)).unwrap();
+            tx_closure
+                .lock()
+                .unwrap()
+                .send(Message::Telemetry(msg))
+                .unwrap();
             Ok(None)
         }),
     );
 
     methods.insert(
-        String::from("func_params_as_result"),
+        String::from("func_echo_params_as_result"),
         Box::new(func_params_as_result),
     );
 

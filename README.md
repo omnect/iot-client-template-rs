@@ -5,12 +5,11 @@ This `iot-module-template-rs` repository provides code to develop Rust based [Az
 
 ## Template and example code
 This project shows a basic skeleton for an initial implementation of a Rust based iot module. It demonstrates how to make use of our Rust [azure-iot-sdk](https://github.com/ICS-DeviceManagement/azure-iot-sdk) in order to connect to Azure iot-hub. Moreover there are examples to show basic communication patterns:
-1. **Module twin**: There is some logic implemented that demonstrates how the module twin could be used by applications. Therefore the EventHandler trait is implemented in order to receive new desired properties which are directly sent back as reported property.
+1. **Module twin**: There is some logic implemented that demonstrates how the module twin could be used by applications. Therefore the `EventHandler` trait is implemented in order to receive new desired properties which are, as an example, directly sent back as reported property.
 2. **Direct methods**: There are two functions implemented that serve as direct method and can be synchronously called by iot-hub:
-   1. `closure_no_param_no_result`: A closure that doesn't take a parameter and doesn't return a result.
-   2. `func_params_as_result`: A function tha takes a parameter and returns the same parameter as result.
-3. **Cloud to device messages (C2D)** : Not implemented yet.
-4. **Device to cloud messages (D2C)** : Not implemented yet.
+   1. `closure_send_d2c_message`: A closure that doesn't take a parameter and doesn't return a result. The method triggers an outgoing D2C message (@see 3. D2C message).
+   2. `func_echo_params_as_result`: A function that takes a parameter and returns the same parameter as result.
+3. **Device to cloud messages (D2C)** : There is an example showing how send telemetry event message to iot-hub. It can be triggered by a call to the `closure_send_d2c_message` direct method.
 
 All examples can be tested via module view in Azure portal or via [iot-explorer](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer)).
 
