@@ -16,9 +16,9 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     let tx_app2client = Arc::new(Mutex::new(tx_app2client));
 
     // connect via identity servcie
-    let connection_string = None;
+    // let connection_string = None;
     // alternatively use connection string
-    // let connection_string = Some("optional connection string");
+    let connection_string = Some("HostName=iothub-ics-dev.azure-devices.net;DeviceId=jza-sim1-02:42:ac:11:00:03;ModuleId=iot-module-template-rs;SharedAccessKey=gswt1jf7AfJtZUNAGCL1c38TSO/5BVe+KxwFuVGcumo=");
 
     let mut methods = HashMap::<String, DirectMethod>::new();
 
@@ -28,7 +28,9 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         String::from("closure_send_d2c_message"),
         IotModuleTemplate::make_direct_method(move |_in_json| {
             let msg = IotMessage::builder()
-                .set_body(serde_json::to_vec("{ \"my telemetry message\": \"hi from device\" }").unwrap())
+                .set_body(
+                    serde_json::to_vec("{ \"my telemetry message\": \"hi from device\" }").unwrap(),
+                )
                 .set_id(String::from("my msg id"))
                 .set_correlation_id(String::from("my correleation id"))
                 .set_property(
@@ -61,6 +63,13 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     for msg in rx_client2app {
         match msg {
+            Message::Unauthenticated(reason) => {
+                template.stop().unwrap();
+                return Err(Box::<dyn Error + Send + Sync>::from(format!(
+                    "No connection. Reason: {:?}",
+                    reason
+                )));
+            }
             Message::Desired(state, desired) => {
                 if let TwinUpdateState::Partial = state {
                     let mut map: serde_json::Map<String, serde_json::Value> =

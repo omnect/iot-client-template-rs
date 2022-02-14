@@ -1,18 +1,23 @@
 use azure_iot_sdk::client::*;
 use azure_iot_sdk::message::*;
 use log::debug;
+use sd_notify::NotifyState;
 use std::collections::HashMap;
 use std::error::Error;
+use std::sync::Once;
 use std::sync::{mpsc::Receiver, mpsc::Sender, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time;
+
+static SD_NOTIFY_ONCE: Once = Once::new();
 
 #[derive(Debug)]
 pub enum Message {
     Desired(TwinUpdateState, serde_json::Value),
     Reported(serde_json::Value),
     Telemetry(IotMessage),
+    Unauthenticated(UnauthenticatedReason),
     Terminate,
 }
 
@@ -22,7 +27,20 @@ struct IotModuleEventHandler {
 }
 
 impl EventHandler for IotModuleEventHandler {
-    fn handle_message(&self, _message: IotMessage) -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn handle_connection_status(&self, auth_status: AuthenticationStatus) {
+        match auth_status {
+            AuthenticationStatus::Authenticated => {
+                SD_NOTIFY_ONCE.call_once(|| {
+                    let _ = sd_notify::notify(true, &[NotifyState::Ready]);
+                });
+            }
+            AuthenticationStatus::Unauthenticated(reason) => {
+                self.tx.send(Message::Unauthenticated(reason)).unwrap()
+            }
+        }
+    }
+
+    fn handle_c2d_message(&self, _message: IotMessage) -> Result<(), Box<dyn Error + Send + Sync>> {
         Ok(())
     }
 
