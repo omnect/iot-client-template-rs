@@ -78,7 +78,7 @@ impl IotModuleTemplate {
                 while *running.lock().unwrap() {
                     match rx.recv_timeout(hundred_millis) {
                         Ok(Message::Reported(reported)) => client.send_reported_state(reported)?,
-                        Ok(Message::Telemetry(telemetry)) => client.send_d2c_message(telemetry)?,
+                        Ok(Message::Telemetry(telemetry)) => client.send_d2c_message(telemetry).map(|_| ())?,
                         Ok(Message::Terminate) => return Ok(()),
                         Ok(_) => debug!("Client received unhandled message"),
                         Err(_) => (),
