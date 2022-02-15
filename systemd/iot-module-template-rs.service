@@ -11,6 +11,7 @@ Restart=always
 RestartSec=5
 User=iotmodule-rs
 Group=iotmodule-rs
+WatchdogSec=30s
 
 ExecStart=/usr/bin/iot-module-template-rs
 

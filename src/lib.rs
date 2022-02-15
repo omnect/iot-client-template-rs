@@ -16,9 +16,9 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     let tx_app2client = Arc::new(Mutex::new(tx_app2client));
 
     // connect via identity servcie
-    // let connection_string = None;
+    let connection_string = None;
     // alternatively use connection string
-    let connection_string = Some("HostName=iothub-ics-dev.azure-devices.net;DeviceId=jza-sim1-02:42:ac:11:00:03;ModuleId=iot-module-template-rs;SharedAccessKey=gswt1jf7AfJtZUNAGCL1c38TSO/5BVe+KxwFuVGcumo=");
+    let connection_string = Some("optional connection string");
 
     let mut methods = HashMap::<String, DirectMethod>::new();
 

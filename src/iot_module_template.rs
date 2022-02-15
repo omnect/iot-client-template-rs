@@ -9,6 +9,7 @@ use std::sync::{mpsc::Receiver, mpsc::Sender, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time;
+use std::time::SystemTime;
 
 static SD_NOTIFY_ONCE: Once = Once::new();
 
@@ -28,14 +29,17 @@ struct IotModuleEventHandler {
 
 impl EventHandler for IotModuleEventHandler {
     fn handle_connection_status(&self, auth_status: AuthenticationStatus) {
-        match auth_status {
-            AuthenticationStatus::Authenticated => {
-                SD_NOTIFY_ONCE.call_once(|| {
-                    let _ = sd_notify::notify(true, &[NotifyState::Ready]);
-                });
-            }
-            AuthenticationStatus::Unauthenticated(reason) => {
-                self.tx.send(Message::Unauthenticated(reason)).unwrap()
+        #[cfg(feature = "systemd")]
+        {
+            match auth_status {
+                AuthenticationStatus::Authenticated => {
+                    SD_NOTIFY_ONCE.call_once(|| {
+                        let _ = sd_notify::notify(true, &[NotifyState::Ready]);
+                    });
+                }
+                AuthenticationStatus::Unauthenticated(reason) => {
+                    self.tx.send(Message::Unauthenticated(reason)).unwrap()
+                }
             }
         }
     }
@@ -93,6 +97,19 @@ impl IotModuleTemplate {
                     _ => IotHubModuleClient::from_identity_service(event_handler)?,
                 };
 
+                let wdt;
+                let mut usec = u64::MAX;
+                let mut now = SystemTime::now();
+
+                #[cfg(feature = "systemd")]
+                {
+                    wdt = sd_notify::watchdog_enabled(true, &mut usec)?;
+
+                    if wdt {
+                        usec = usec / 2;
+                    }
+                }
+
                 while *running.lock().unwrap() {
                     match rx.recv_timeout(hundred_millis) {
                         Ok(Message::Reported(reported)) => client.send_reported_state(reported)?,
@@ -105,6 +122,14 @@ impl IotModuleTemplate {
                     };
 
                     client.do_work();
+
+                    #[cfg(feature = "systemd")]
+                    {
+                        if wdt && usec < now.elapsed()?.as_secs() {
+                            sd_notify::notify(true, &[NotifyState::Watchdog])?;
+                            now = SystemTime::now();
+                        }
+                    }
                 }
 
                 Ok(())
