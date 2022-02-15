@@ -1,15 +1,20 @@
 pub mod iot_module_template;
 use azure_iot_sdk::client::*;
+use azure_iot_sdk::message::*;
 use iot_module_template::{IotModuleTemplate, Message};
 use log::debug;
 use serde_json::json;
 use std::collections::HashMap;
 use std::error::Error;
-use std::sync::mpsc;
+use std::sync::{mpsc, Arc, Mutex};
 
 pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
+    let mut template = IotModuleTemplate::new();
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
+
+    let tx_app2client = Arc::new(Mutex::new(tx_app2client));
+
     // connect via identity servcie
     let connection_string = None;
     // alternatively use connection string
@@ -17,17 +22,35 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     let mut methods = HashMap::<String, DirectMethod>::new();
 
+    let tx_closure = Arc::clone(&tx_app2client);
+
     methods.insert(
-        String::from("closure_no_param_no_result"),
-        IotModuleTemplate::make_direct_method(|_in_json| Ok(None)),
+        String::from("closure_send_d2c_message"),
+        IotModuleTemplate::make_direct_method(move |_in_json| {
+            let msg = IotMessage::builder()
+                .set_body(serde_json::to_vec("{ \"my telemetry message\": \"hi from device\" }").unwrap())
+                .set_id(String::from("my msg id"))
+                .set_correlation_id(String::from("my correleation id"))
+                .set_property(
+                    String::from("my property key"),
+                    String::from("my property value"),
+                )
+                .set_output_queue(String::from("my output queue"))
+                .build();
+
+            tx_closure
+                .lock()
+                .unwrap()
+                .send(Message::Telemetry(msg))
+                .unwrap();
+            Ok(None)
+        }),
     );
 
     methods.insert(
-        String::from("func_params_as_result"),
+        String::from("func_echo_params_as_result"),
         Box::new(func_params_as_result),
     );
-
-    let mut template = IotModuleTemplate::new();
 
     template.run(
         connection_string,
@@ -46,6 +69,8 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
                     map.remove("$version");
 
                     tx_app2client
+                        .lock()
+                        .unwrap()
                         .send(Message::Reported(serde_json::Value::Object(map)))
                         .unwrap();
                 }

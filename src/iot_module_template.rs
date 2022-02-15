@@ -12,6 +12,7 @@ use std::time;
 pub enum Message {
     Desired(TwinUpdateState, serde_json::Value),
     Reported(serde_json::Value),
+    Telemetry(IotMessage),
     Terminate,
 }
 
@@ -21,7 +22,7 @@ struct IotModuleEventHandler {
 }
 
 impl EventHandler for IotModuleEventHandler {
-    fn handle_message(&self, _message: IotHubMessage) -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn handle_message(&self, _message: IotMessage) -> Result<(), Box<dyn Error + Send + Sync>> {
         Ok(())
     }
 
@@ -77,6 +78,7 @@ impl IotModuleTemplate {
                 while *running.lock().unwrap() {
                     match rx.recv_timeout(hundred_millis) {
                         Ok(Message::Reported(reported)) => client.send_reported_state(reported)?,
+                        Ok(Message::Telemetry(telemetry)) => client.send_d2c_message(telemetry).map(|_| ())?,
                         Ok(Message::Terminate) => return Ok(()),
                         Ok(_) => debug!("Client received unhandled message"),
                         Err(_) => (),
