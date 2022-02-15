@@ -18,7 +18,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     // connect via identity servcie
     let connection_string = None;
     // alternatively use connection string
-    let connection_string = Some("optional connection string");
+    //let connection_string = Some("optional connection string");
 
     let mut methods = HashMap::<String, DirectMethod>::new();
 
