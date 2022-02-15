@@ -182,7 +182,7 @@ dependencies = [
 
 [[package]]
 name = "azure-iot-sdk"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "azure-iot-sdk-sys",
  "eis-utils",
@@ -821,7 +821,7 @@ dependencies = [
 
 [[package]]
 name = "iot-module-template-rs"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "azure-iot-sdk",
  "env_logger 0.8.4",
