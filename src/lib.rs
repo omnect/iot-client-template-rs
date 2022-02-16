@@ -1,4 +1,6 @@
 pub mod iot_module_template;
+#[cfg(feature = "systemd")]
+pub mod systemd;
 use azure_iot_sdk::client::*;
 use azure_iot_sdk::message::*;
 use iot_module_template::{IotModuleTemplate, Message};
@@ -18,7 +20,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     // connect via identity servcie
     let connection_string = None;
     // alternatively use connection string
-    //let connection_string = Some("optional connection string");
+    // let connection_string = Some("optional connection string");
 
     let mut methods = HashMap::<String, DirectMethod>::new();
 
@@ -29,7 +31,8 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         IotModuleTemplate::make_direct_method(move |_in_json| {
             let msg = IotMessage::builder()
                 .set_body(
-                    serde_json::to_vec("{ \"my telemetry message\": \"hi from device\" }").unwrap(),
+                    serde_json::to_vec(r#"{"my telemetry message": "hi from device"}"#)
+                        .unwrap(),
                 )
                 .set_id(String::from("my msg id"))
                 .set_correlation_id(String::from("my correleation id"))
@@ -63,6 +66,10 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     for msg in rx_client2app {
         match msg {
+            Message::Authenticated => {
+                #[cfg(feature = "systemd")]
+                systemd::notify_ready();
+            }
             Message::Unauthenticated(reason) => {
                 template.stop().unwrap();
                 return Err(Box::<dyn Error + Send + Sync>::from(format!(

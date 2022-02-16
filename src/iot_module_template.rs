@@ -1,23 +1,22 @@
 use azure_iot_sdk::client::*;
 use azure_iot_sdk::message::*;
 use log::debug;
-use sd_notify::NotifyState;
 use std::collections::HashMap;
 use std::error::Error;
-use std::sync::Once;
 use std::sync::{mpsc::Receiver, mpsc::Sender, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time;
-use std::time::SystemTime;
 
-static SD_NOTIFY_ONCE: Once = Once::new();
+#[cfg(feature = "systemd")]
+use crate::systemd::WatchdogHandler;
 
 #[derive(Debug)]
 pub enum Message {
     Desired(TwinUpdateState, serde_json::Value),
     Reported(serde_json::Value),
     Telemetry(IotMessage),
+    Authenticated,
     Unauthenticated(UnauthenticatedReason),
     Terminate,
 }
@@ -29,17 +28,10 @@ struct IotModuleEventHandler {
 
 impl EventHandler for IotModuleEventHandler {
     fn handle_connection_status(&self, auth_status: AuthenticationStatus) {
-        #[cfg(feature = "systemd")]
-        {
-            match auth_status {
-                AuthenticationStatus::Authenticated => {
-                    SD_NOTIFY_ONCE.call_once(|| {
-                        let _ = sd_notify::notify(true, &[NotifyState::Ready]);
-                    });
-                }
-                AuthenticationStatus::Unauthenticated(reason) => {
-                    self.tx.send(Message::Unauthenticated(reason)).unwrap()
-                }
+        match auth_status {
+            AuthenticationStatus::Authenticated => self.tx.send(Message::Authenticated).unwrap(),
+            AuthenticationStatus::Unauthenticated(reason) => {
+                self.tx.send(Message::Unauthenticated(reason)).unwrap()
             }
         }
     }
@@ -97,18 +89,11 @@ impl IotModuleTemplate {
                     _ => IotHubModuleClient::from_identity_service(event_handler)?,
                 };
 
-                let wdt;
-                let mut usec = u64::MAX;
-                let mut now = SystemTime::now();
+                #[cfg(feature = "systemd")]
+                let mut wdt = WatchdogHandler::default();
 
                 #[cfg(feature = "systemd")]
-                {
-                    wdt = sd_notify::watchdog_enabled(true, &mut usec)?;
-
-                    if wdt {
-                        usec = usec / 2;
-                    }
-                }
+                wdt.init()?;
 
                 while *running.lock().unwrap() {
                     match rx.recv_timeout(hundred_millis) {
@@ -124,12 +109,7 @@ impl IotModuleTemplate {
                     client.do_work();
 
                     #[cfg(feature = "systemd")]
-                    {
-                        if wdt && usec < now.elapsed()?.as_secs() {
-                            sd_notify::notify(true, &[NotifyState::Watchdog])?;
-                            now = SystemTime::now();
-                        }
-                    }
+                    wdt.notify()?;
                 }
 
                 Ok(())

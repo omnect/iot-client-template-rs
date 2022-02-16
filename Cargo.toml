@@ -1,7 +1,7 @@
 [package]
 name = "iot-module-template-rs"
 version = "0.2.2"
-edition = "2018"
+edition = "2021"
 authors = ["Joerg Zeidler <joerg.zeidler@conplement.de>", "Jan Zachmann <jan.zachmann@conplement.de>"]
 repository = "git@github.com:ICS-DeviceManagement/iot-module-template-rs.git"
 license = "MIT OR Apache-2.0"
