@@ -8,11 +8,16 @@ use std::thread;
 use std::thread::JoinHandle;
 use std::time;
 
+#[cfg(feature = "systemd")]
+use crate::systemd::WatchdogHandler;
+
 #[derive(Debug)]
 pub enum Message {
     Desired(TwinUpdateState, serde_json::Value),
     Reported(serde_json::Value),
     Telemetry(IotMessage),
+    Authenticated,
+    Unauthenticated(UnauthenticatedReason),
     Terminate,
 }
 
@@ -22,7 +27,16 @@ struct IotModuleEventHandler {
 }
 
 impl EventHandler for IotModuleEventHandler {
-    fn handle_message(&self, _message: IotMessage) -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn handle_connection_status(&self, auth_status: AuthenticationStatus) {
+        match auth_status {
+            AuthenticationStatus::Authenticated => self.tx.send(Message::Authenticated).unwrap(),
+            AuthenticationStatus::Unauthenticated(reason) => {
+                self.tx.send(Message::Unauthenticated(reason)).unwrap()
+            }
+        }
+    }
+
+    fn handle_c2d_message(&self, _message: IotMessage) -> Result<(), Box<dyn Error + Send + Sync>> {
         Ok(())
     }
 
@@ -75,16 +89,27 @@ impl IotModuleTemplate {
                     _ => IotHubModuleClient::from_identity_service(event_handler)?,
                 };
 
+                #[cfg(feature = "systemd")]
+                let mut wdt = WatchdogHandler::default();
+
+                #[cfg(feature = "systemd")]
+                wdt.init()?;
+
                 while *running.lock().unwrap() {
                     match rx.recv_timeout(hundred_millis) {
                         Ok(Message::Reported(reported)) => client.send_reported_state(reported)?,
-                        Ok(Message::Telemetry(telemetry)) => client.send_d2c_message(telemetry).map(|_| ())?,
+                        Ok(Message::Telemetry(telemetry)) => {
+                            client.send_d2c_message(telemetry).map(|_| ())?
+                        }
                         Ok(Message::Terminate) => return Ok(()),
                         Ok(_) => debug!("Client received unhandled message"),
                         Err(_) => (),
                     };
 
                     client.do_work();
+
+                    #[cfg(feature = "systemd")]
+                    wdt.notify()?;
                 }
 
                 Ok(())

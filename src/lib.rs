@@ -1,4 +1,6 @@
 pub mod iot_module_template;
+#[cfg(feature = "systemd")]
+pub mod systemd;
 use azure_iot_sdk::client::*;
 use azure_iot_sdk::message::*;
 use iot_module_template::{IotModuleTemplate, Message};
@@ -28,7 +30,10 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         String::from("closure_send_d2c_message"),
         IotModuleTemplate::make_direct_method(move |_in_json| {
             let msg = IotMessage::builder()
-                .set_body(serde_json::to_vec("{ \"my telemetry message\": \"hi from device\" }").unwrap())
+                .set_body(
+                    serde_json::to_vec(r#"{"my telemetry message": "hi from device"}"#)
+                        .unwrap(),
+                )
                 .set_id(String::from("my msg id"))
                 .set_correlation_id(String::from("my correleation id"))
                 .set_property(
@@ -61,6 +66,17 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     for msg in rx_client2app {
         match msg {
+            Message::Authenticated => {
+                #[cfg(feature = "systemd")]
+                systemd::notify_ready();
+            }
+            Message::Unauthenticated(reason) => {
+                template.stop().unwrap();
+                return Err(Box::<dyn Error + Send + Sync>::from(format!(
+                    "No connection. Reason: {:?}",
+                    reason
+                )));
+            }
             Message::Desired(state, desired) => {
                 if let TwinUpdateState::Partial = state {
                     let mut map: serde_json::Map<String, serde_json::Value> =
