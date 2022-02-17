@@ -1,13 +1,15 @@
-use std::error::Error;
+use log::debug;
 use sd_notify::NotifyState;
-use std::time::Instant;
+use std::error::Error;
 use std::sync::Once;
+use std::time::Instant;
 
 static SD_NOTIFY_ONCE: Once = Once::new();
 
 pub fn notify_ready() {
     SD_NOTIFY_ONCE.call_once(|| {
-        let _ = sd_notify::notify(true, &[NotifyState::Ready]);
+        debug!("notify ready=1");
+        let _ = sd_notify::notify(false, &[NotifyState::Ready]);
     });
 }
 
@@ -29,18 +31,25 @@ impl WatchdogHandler {
     pub fn init(&mut self) -> Result<(), Box<dyn Error + Send + Sync>> {
         self.usec = u64::MAX;
 
-        if sd_notify::watchdog_enabled(true, &mut self.usec)? {
+        if sd_notify::watchdog_enabled(false, &mut self.usec)? {
             self.usec = self.usec / 2;
             self.now = Some(Instant::now());
         }
-        
+
+        debug!(
+            "watchdog settings: enabled: {} interval: {}µs",
+            self.now.is_some(),
+            self.usec
+        );
+
         Ok(())
     }
 
-    pub fn notify(&mut self)  -> Result<(), Box<dyn Error + Send + Sync>> {
-        if let Some(ref mut now) =  self.now {
+    pub fn notify(&mut self) -> Result<(), Box<dyn Error + Send + Sync>> {
+        if let Some(ref mut now) = self.now {
             if u128::from(self.usec) < now.elapsed().as_micros() {
-                sd_notify::notify(true, &[NotifyState::Watchdog])?;
+                debug!("notify watchdog=1");
+                let _ = sd_notify::notify(false, &[NotifyState::Watchdog])?;
                 *now = Instant::now();
             }
         }
