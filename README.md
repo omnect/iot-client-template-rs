@@ -3,6 +3,10 @@
 ## What is iot-module-template-rs?
 This `iot-module-template-rs` repository provides code to develop Rust based [Azure IoT modules](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-module-twins) for ICS_DeviceManagement. In comparison to [IoTEdge modules](https://docs.microsoft.com/en-us/azure/iot-edge/module-development?view=iotedge-2020-11) these modules are not containerized and run natively on the device. In order to develop C/C++ based IoTEdge modules for ICS_DeviceManagement refer to the [iotedge-module-template](https://github.com/ICS-DeviceManagement/iotedge-module-template) repository.
 
+@todo
+   - mention sytemd
+   - mention device twin
+
 ## Template and example code
 This project shows a basic skeleton for an initial implementation of a Rust based iot module. It demonstrates how to make use of our Rust [azure-iot-sdk](https://github.com/ICS-DeviceManagement/azure-iot-sdk) in order to connect to Azure iot-hub. Moreover there are examples to show basic communication patterns:
 1. **Module twin**: There is some logic implemented that demonstrates how the module twin could be used by applications. Therefore the `EventHandler` trait is implemented in order to receive new desired properties which are, as an example, directly sent back as reported property.

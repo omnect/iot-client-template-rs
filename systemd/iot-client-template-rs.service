@@ -1,5 +1,5 @@
 [Unit]
-Description=iot-module-template-rs service
+Description=iot-client-template-rs service
 After=network-online.target aziot-identityd.service
 Wants=network-online.target aziot-identityd.service
 StartLimitBurst=10
@@ -9,11 +9,11 @@ StartLimitIntervalSec=120
 Type=notify
 Restart=always
 RestartSec=5
-User=iotmodule-rs
-Group=iotmodule-rs
+User=iot-client-rs
+Group=iot-client-rs
 WatchdogSec=30s
 
-ExecStart=/usr/bin/iot-module-template-rs
+ExecStart=/usr/bin/iot-client-template-rs
 
 [Install]
 WantedBy=multi-user.target

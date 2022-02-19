@@ -1,9 +1,10 @@
-pub mod iot_module_template;
+pub mod iot_client_template;
 #[cfg(feature = "systemd")]
 pub mod systemd;
 use azure_iot_sdk::client::*;
 use azure_iot_sdk::message::*;
-use iot_module_template::{IotModuleTemplate, Message};
+use azure_iot_sdk::twin::*;
+use iot_client_template::{IotClientTemplate, Message};
 use log::debug;
 use serde_json::json;
 use std::collections::HashMap;
@@ -11,16 +12,16 @@ use std::error::Error;
 use std::sync::{mpsc, Arc, Mutex};
 
 pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
-    let mut template = IotModuleTemplate::new();
+    let mut template = IotClientTemplate::new();
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
 
     let tx_app2client = Arc::new(Mutex::new(tx_app2client));
 
     // connect via identity servcie
-    let connection_string = None;
+    // let connection_string = None;
     // alternatively use connection string
-    // let connection_string = Some("optional connection string");
+    let connection_string = Some("HostName=iothub-ics-dev.azure-devices.net;DeviceId=jza-sim1-02:42:ac:11:00:03;SharedAccessKey=NPRDesMoNkmN6Vr9XyJGi9hGh/jJQPCGyAddFeCYuqo=");
 
     let mut methods = HashMap::<String, DirectMethod>::new();
 
@@ -28,11 +29,10 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     methods.insert(
         String::from("closure_send_d2c_message"),
-        IotModuleTemplate::make_direct_method(move |_in_json| {
+        IotClientTemplate::make_direct_method(move |_in_json| {
             let msg = IotMessage::builder()
                 .set_body(
-                    serde_json::to_vec(r#"{"my telemetry message": "hi from device"}"#)
-                        .unwrap(),
+                    serde_json::to_vec(r#"{"my telemetry message": "hi from device"}"#).unwrap(),
                 )
                 .set_id(String::from("my msg id"))
                 .set_correlation_id(String::from("my correleation id"))
@@ -57,7 +57,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         Box::new(func_params_as_result),
     );
 
-    template.run(
+    template.run::<DeviceTwin>(
         connection_string,
         Some(methods),
         tx_client2app,

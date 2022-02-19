@@ -7,15 +7,15 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug executable 'iot-module-template-rs'",
+      "name": "Debug executable 'iot-client-template-rs'",
       "cargo": {
         "args": [
           "build",
-          "--bin=iot-module-template-rs",
-          "--package=iot-module-template-rs"
+          "--bin=iot-client-template-rs",
+          "--package=iot-client-template-rs"
         ],
         "filter": {
-          "name": "iot-module-template-rs",
+          "name": "iot-client-template-rs",
           "kind": "bin"
         }
       },
@@ -26,16 +26,16 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug unit tests in executable 'iot-module-template-rs'",
+      "name": "Debug unit tests in executable 'iot-client-template-rs'",
       "cargo": {
         "args": [
           "test",
           "--no-run",
-          "--bin=iot-module-template-rs",
-          "--package=iot-module-template-rs"
+          "--bin=iot-client-template-rs",
+          "--package=iot-client-template-rs"
         ],
         "filter": {
-          "name": "iot-module-template-rs",
+          "name": "iot-client-template-rs",
           "kind": "bin"
         }
       },

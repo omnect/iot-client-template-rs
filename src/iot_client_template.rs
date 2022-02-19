@@ -1,5 +1,6 @@
 use azure_iot_sdk::client::*;
 use azure_iot_sdk::message::*;
+use azure_iot_sdk::twin::Twin;
 use log::debug;
 use std::collections::HashMap;
 use std::error::Error;
@@ -21,12 +22,12 @@ pub enum Message {
     Terminate,
 }
 
-struct IotModuleEventHandler {
+struct IotHubClientEventHandler {
     direct_methods: Option<HashMap<String, DirectMethod>>,
     tx: Sender<Message>,
 }
 
-impl EventHandler for IotModuleEventHandler {
+impl EventHandler for IotHubClientEventHandler {
     fn handle_connection_status(&self, auth_status: AuthenticationStatus) {
         match auth_status {
             AuthenticationStatus::Authenticated => self.tx.send(Message::Authenticated).unwrap(),
@@ -55,20 +56,20 @@ impl EventHandler for IotModuleEventHandler {
     }
 }
 
-pub struct IotModuleTemplate {
+pub struct IotClientTemplate {
     thread: Option<JoinHandle<Result<(), Box<dyn Error + Send + Sync + Send + Sync>>>>,
     run: Arc<Mutex<bool>>,
 }
 
-impl IotModuleTemplate {
+impl IotClientTemplate {
     pub fn new() -> Self {
-        IotModuleTemplate {
+        IotClientTemplate {
             thread: None,
             run: Arc::new(Mutex::new(false)),
         }
     }
 
-    pub fn run(
+    pub fn run<T: Twin>(
         &mut self,
         connection_string: Option<&'static str>,
         direct_methods: Option<HashMap<String, DirectMethod>>,
@@ -82,11 +83,13 @@ impl IotModuleTemplate {
         self.thread = Some(thread::spawn(
             move || -> Result<(), Box<dyn Error + Send + Sync + Send + Sync>> {
                 let hundred_millis = time::Duration::from_millis(100);
-                let event_handler = IotModuleEventHandler { direct_methods, tx };
+                let event_handler = IotHubClientEventHandler { direct_methods, tx };
 
                 let mut client = match connection_string {
-                    Some(cs) => IotHubModuleClient::from_connection_string(cs, event_handler)?,
-                    _ => IotHubModuleClient::from_identity_service(event_handler)?,
+                    Some(cs) => {
+                        IotHubClient::<T>::from_connection_string(cs, event_handler)?
+                    }
+                    _ => IotHubClient::from_identity_service(event_handler)?,
                 };
 
                 #[cfg(feature = "systemd")]
