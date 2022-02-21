@@ -16,7 +16,8 @@ use crate::systemd::WatchdogHandler;
 pub enum Message {
     Desired(TwinUpdateState, serde_json::Value),
     Reported(serde_json::Value),
-    Telemetry(IotMessage),
+    Device2Cloud(IotMessage),
+    Cloud2Device(IotMessage),
     Authenticated,
     Unauthenticated(UnauthenticatedReason),
     Terminate,
@@ -37,8 +38,13 @@ impl EventHandler for IotHubClientEventHandler {
         }
     }
 
-    fn handle_c2d_message(&self, _message: IotMessage) -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn handle_c2d_message(&self, message: IotMessage) -> Result<(), Box<dyn Error + Send + Sync>> {
+        self.tx.send(Message::Cloud2Device(message))?;
         Ok(())
+    }
+
+    fn get_c2d_message_property_keys(&self) -> Vec<&'static str> {
+        vec!["p1", "p2"]
     }
 
     fn handle_twin_desired(
@@ -86,9 +92,7 @@ impl IotClientTemplate {
                 let event_handler = IotHubClientEventHandler { direct_methods, tx };
 
                 let mut client = match connection_string {
-                    Some(cs) => {
-                        IotHubClient::<T>::from_connection_string(cs, event_handler)?
-                    }
+                    Some(cs) => IotHubClient::<T>::from_connection_string(cs, event_handler)?,
                     _ => IotHubClient::from_identity_service(event_handler)?,
                 };
 
@@ -101,7 +105,7 @@ impl IotClientTemplate {
                 while *running.lock().unwrap() {
                     match rx.recv_timeout(hundred_millis) {
                         Ok(Message::Reported(reported)) => client.send_reported_state(reported)?,
-                        Ok(Message::Telemetry(telemetry)) => {
+                        Ok(Message::Device2Cloud(telemetry)) => {
                             client.send_d2c_message(telemetry).map(|_| ())?
                         }
                         Ok(Message::Terminate) => return Ok(()),

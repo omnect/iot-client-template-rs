@@ -1,3 +1,15 @@
+#[cfg(not(any(feature = "DeviceTwin", feature = "ModuleTwin")))]
+compile_error!("Either feature \"DeviceTwin\" or \"ModuleTwin\" must be enabled for this crate.");
+
+#[cfg(all(feature = "DeviceTwin", feature = "ModuleTwin"))]
+compile_error!("Either feature \"DeviceTwin\" or \"ModuleTwin\" must be enabled for this crate.");
+
+#[cfg(feature = "DeviceTwin")]
+type TwinType = DeviceTwin;
+
+#[cfg(feature = "ModuleTwin")]
+type TwinType = ModuleTwin;
+
 pub mod iot_client_template;
 #[cfg(feature = "systemd")]
 pub mod systemd;
@@ -15,16 +27,8 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     let mut template = IotClientTemplate::new();
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
-
     let tx_app2client = Arc::new(Mutex::new(tx_app2client));
-
-    // connect via identity servcie
-    // let connection_string = None;
-    // alternatively use connection string
-    let connection_string = Some("HostName=iothub-ics-dev.azure-devices.net;DeviceId=jza-sim1-02:42:ac:11:00:03;SharedAccessKey=NPRDesMoNkmN6Vr9XyJGi9hGh/jJQPCGyAddFeCYuqo=");
-
     let mut methods = HashMap::<String, DirectMethod>::new();
-
     let tx_closure = Arc::clone(&tx_app2client);
 
     methods.insert(
@@ -46,7 +50,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
             tx_closure
                 .lock()
                 .unwrap()
-                .send(Message::Telemetry(msg))
+                .send(Message::Device2Cloud(msg))
                 .unwrap();
             Ok(None)
         }),
@@ -57,8 +61,8 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         Box::new(func_params_as_result),
     );
 
-    template.run::<DeviceTwin>(
-        connection_string,
+    template.run::<TwinType>(
+        None,
         Some(methods),
         tx_client2app,
         rx_app2client,
@@ -90,6 +94,12 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
                         .send(Message::Reported(serde_json::Value::Object(map)))
                         .unwrap();
                 }
+            }
+            Message::Cloud2Device(msg) => {
+                debug!(
+                    "Received c2d message with \n body: {:?}\n properties: {:?} \n system properties: {:?}",
+                    std::str::from_utf8(&msg.body).unwrap(), msg.properties, msg.system_properties
+                );
             }
             _ => debug!("Application received unhandled message"),
         }
