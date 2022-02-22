@@ -1,13 +1,13 @@
-#[cfg(not(any(feature = "DeviceTwin", feature = "ModuleTwin")))]
-compile_error!("Either feature \"DeviceTwin\" or \"ModuleTwin\" must be enabled for this crate.");
+#[cfg(not(any(feature = "device_twin", feature = "module_twin")))]
+compile_error!("Either feature \"device_twin\" or \"module_twin\" must be enabled for this crate.");
 
-#[cfg(all(feature = "DeviceTwin", feature = "ModuleTwin"))]
-compile_error!("Either feature \"DeviceTwin\" or \"ModuleTwin\" must be enabled for this crate.");
+#[cfg(all(feature = "device_twin", feature = "module_twin"))]
+compile_error!("Either feature \"device_twin\" or \"module_twin\" must be enabled for this crate.");
 
-#[cfg(feature = "DeviceTwin")]
+#[cfg(feature = "device_twin")]
 type TwinType = DeviceTwin;
 
-#[cfg(feature = "ModuleTwin")]
+#[cfg(feature = "module_twin")]
 type TwinType = ModuleTwin;
 
 pub mod iot_client_template;
@@ -29,6 +29,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     let (tx_app2client, rx_app2client) = mpsc::channel();
     let tx_app2client = Arc::new(Mutex::new(tx_app2client));
     let mut methods = HashMap::<String, DirectMethod>::new();
+
     let tx_closure = Arc::clone(&tx_app2client);
 
     methods.insert(
@@ -61,12 +62,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         Box::new(func_params_as_result),
     );
 
-    template.run::<TwinType>(
-        None,
-        Some(methods),
-        tx_client2app,
-        rx_app2client,
-    );
+    template.run::<TwinType>(None, Some(methods), tx_client2app, rx_app2client);
 
     for msg in rx_client2app {
         match msg {

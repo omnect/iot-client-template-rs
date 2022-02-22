@@ -17,9 +17,9 @@ sd-notify = { git = "ssh://git@github.com/ICS-DeviceManagement/sd-notify.git", t
 
 
 [features]
-# select either "DeviceTwin" or "ModuleTwin" functionality
+# select either "device_twin" or "module_twin" functionality
 # select if systemd ready and watchdog should be enabled
-default = ["DeviceTwin", "systemd"]
+default = ["module_twin", "systemd"]
 systemd = ["sd-notify"]
-DeviceTwin = []
-ModuleTwin = []
+device_twin = []
+module_twin = []
