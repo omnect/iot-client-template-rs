@@ -822,7 +822,7 @@ dependencies = [
 
 [[package]]
 name = "iot-client-template-rs"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "azure-iot-sdk",
  "env_logger 0.8.4",
