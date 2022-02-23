@@ -10,13 +10,13 @@ type TwinType = DeviceTwin;
 #[cfg(feature = "module_twin")]
 type TwinType = ModuleTwin;
 
-pub mod iot_client_template;
+pub mod client;
 #[cfg(feature = "systemd")]
 pub mod systemd;
 use azure_iot_sdk::client::*;
 use azure_iot_sdk::message::*;
 use azure_iot_sdk::twin::*;
-use iot_client_template::{IotClientTemplate, Message};
+use client::{Client, Message};
 use log::debug;
 use serde_json::json;
 use std::collections::HashMap;
@@ -24,17 +24,16 @@ use std::error::Error;
 use std::sync::{mpsc, Arc, Mutex};
 
 pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
-    let mut template = IotClientTemplate::new();
+    let mut client = Client::new();
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
     let tx_app2client = Arc::new(Mutex::new(tx_app2client));
     let mut methods = HashMap::<String, DirectMethod>::new();
-
     let tx_closure = Arc::clone(&tx_app2client);
 
     methods.insert(
         String::from("closure_send_d2c_message"),
-        IotClientTemplate::make_direct_method(move |_in_json| {
+        Client::make_direct_method(move |_in_json| {
             let msg = IotMessage::builder()
                 .set_body(
                     serde_json::to_vec(r#"{"my telemetry message": "hi from device"}"#).unwrap(),
@@ -62,7 +61,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         Box::new(func_params_as_result),
     );
 
-    template.run::<TwinType>(None, Some(methods), tx_client2app, rx_app2client);
+    client.run::<TwinType>(None, Some(methods), tx_client2app, rx_app2client);
 
     for msg in rx_client2app {
         match msg {
@@ -71,7 +70,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
                 systemd::notify_ready();
             }
             Message::Unauthenticated(reason) => {
-                template.stop().unwrap();
+                client.stop().unwrap();
                 return Err(Box::<dyn Error + Send + Sync>::from(format!(
                     "No connection. Reason: {:?}",
                     reason
@@ -101,7 +100,7 @@ pub fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         }
     }
 
-    template.stop()
+    client.stop()
 }
 
 pub fn func_params_as_result(

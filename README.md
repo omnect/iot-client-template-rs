@@ -14,8 +14,8 @@ In your [Cargo.toml](Cargo.toml) file you can configure some common features to 
 ### Twin type
 
 You have to choose which flavour of iot client you want to build. Thus add one of these twin types to your default features:
-1. `device_twin`
-2. `module_twin` (configured by default)
+1. `device_twin` ([currently not supported with TPM attestation](https://azure.github.io/iot-identity-service/develop-an-agent.html#connecting-your-agent-to-iot-hub))
+2. `module_twin` (configured as default)
 
 ### systemd integration
 
@@ -44,10 +44,10 @@ Both of the supported ICS_DeviceManagement targets - [yocto](https://github.com/
 In order to enable the communication between client and cloud a device or module identity needs to be created in Azure iot-hub.
 
 1. **Client identity creation on device via Azure Identity Service (AIS)**: In case your device integrates [AIS](https://azure.github.io/iot-identity-service/), the module creation will be managed automatically on demand. ICS_DeviceManagement yocto layer and simulator support AIS by default.
-2. **Manual identity creation and connection string**: As an alternative you might create your device or modules manually in iot-hub and pass the corresponding connection string to the `template.run()` call in [lib.rs](src/lib.rs):
+2. **Manual identity creation and connection string**: As an alternative you might create your device or modules manually in iot-hub and pass the corresponding connection string to the `client.run()` call in [lib.rs](src/lib.rs):
 
 ```   
-   template.run::<TwinType>(
+   client.run::<TwinType>(
       Some("your connection string"),
       Some(methods),
       tx_client2app,

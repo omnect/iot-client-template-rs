@@ -23,12 +23,12 @@ pub enum Message {
     Terminate,
 }
 
-struct IotHubClientEventHandler {
+struct ClientEventHandler {
     direct_methods: Option<HashMap<String, DirectMethod>>,
     tx: Sender<Message>,
 }
 
-impl EventHandler for IotHubClientEventHandler {
+impl EventHandler for ClientEventHandler {
     fn handle_connection_status(&self, auth_status: AuthenticationStatus) {
         match auth_status {
             AuthenticationStatus::Authenticated => self.tx.send(Message::Authenticated).unwrap(),
@@ -62,14 +62,14 @@ impl EventHandler for IotHubClientEventHandler {
     }
 }
 
-pub struct IotClientTemplate {
+pub struct Client {
     thread: Option<JoinHandle<Result<(), Box<dyn Error + Send + Sync + Send + Sync>>>>,
     run: Arc<Mutex<bool>>,
 }
 
-impl IotClientTemplate {
+impl Client {
     pub fn new() -> Self {
-        IotClientTemplate {
+        Client {
             thread: None,
             run: Arc::new(Mutex::new(false)),
         }
@@ -89,7 +89,7 @@ impl IotClientTemplate {
         self.thread = Some(thread::spawn(
             move || -> Result<(), Box<dyn Error + Send + Sync + Send + Sync>> {
                 let hundred_millis = time::Duration::from_millis(100);
-                let event_handler = IotHubClientEventHandler { direct_methods, tx };
+                let event_handler = ClientEventHandler { direct_methods, tx };
 
                 let mut client = match connection_string {
                     Some(cs) => IotHubClient::<T>::from_connection_string(cs, event_handler)?,
