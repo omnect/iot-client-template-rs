@@ -3,7 +3,7 @@
 # Hint: Both of the supported ICS_DeviceManagement targets
 # [yocto](https://github.com/ICS-DeviceManagement/meta-ics-dm) and
 # [simulator](https://github.com/ICS-DeviceManagement/simulator)
-# integrate iot-module-template-rs.
+# integrate iot-client-template-rs.
 
 # If you intend to built the binary independently the paths from the libraries listed below are required.
 # Copy `.start-local-build-template.sh` to `.start-local-build.sh` and adapt it.
