@@ -16,8 +16,8 @@ use crate::systemd::WatchdogHandler;
 pub enum Message {
     Desired(TwinUpdateState, serde_json::Value),
     Reported(serde_json::Value),
-    Device2Cloud(IotMessage),
-    Cloud2Device(IotMessage),
+    D2C(IotMessage),
+    C2D(IotMessage),
     Authenticated,
     Unauthenticated(UnauthenticatedReason),
     Terminate,
@@ -39,7 +39,7 @@ impl EventHandler for ClientEventHandler {
     }
 
     fn handle_c2d_message(&self, message: IotMessage) -> Result<(), Box<dyn Error + Send + Sync>> {
-        self.tx.send(Message::Cloud2Device(message))?;
+        self.tx.send(Message::C2D(message))?;
         Ok(())
     }
 
@@ -105,7 +105,7 @@ impl Client {
                 while *running.lock().unwrap() {
                     match rx.recv_timeout(hundred_millis) {
                         Ok(Message::Reported(reported)) => client.send_reported_state(reported)?,
-                        Ok(Message::Device2Cloud(telemetry)) => {
+                        Ok(Message::D2C(telemetry)) => {
                             client.send_d2c_message(telemetry).map(|_| ())?
                         }
                         Ok(Message::Terminate) => return Ok(()),
