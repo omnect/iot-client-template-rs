@@ -10,7 +10,8 @@ use std::sync::{Arc, Mutex};
 pub fn get_direct_methods(
     tx_app2client: Arc<Mutex<Sender<Message>>>,
 ) -> Option<HashMap<String, DirectMethod>> {
-    let mut methods = HashMap::new();
+    let mut methods: HashMap<String, DirectMethod> = HashMap::new();
+    
     methods.insert(
         String::from("closure_send_d2c_message"),
         Client::make_direct_method(move |_in_json| {
@@ -31,7 +32,6 @@ pub fn get_direct_methods(
             Ok(None)
         }),
     );
-
     methods.insert(
         String::from("func_echo_params_as_result"),
         Box::new(func_params_as_result),
