@@ -10,7 +10,7 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 #azure-iot-sdk = { git = "ssh://git@github.com/JanZachmann/azure-iot-sdk.git", tag = "0.5.2" }
-azure-iot-sdk = { git = "ssh://git@github.com/JanZachmann/azure-iot-sdk.git", rev = "e707ee7fc899afe4a8747998a7779840676a476a" }
+azure-iot-sdk = { git = "ssh://git@github.com/JanZachmann/azure-iot-sdk.git", rev = "d0d0364fef77ac9fed0c2457d7922f70d56632c7" }
 serde_json = "1.0"
 env_logger = "0.8"
 log = "0.4"
