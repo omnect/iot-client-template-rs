@@ -183,7 +183,7 @@ dependencies = [
 [[package]]
 name = "azure-iot-sdk"
 version = "0.5.2"
-source = "git+ssh://git@github.com/JanZachmann/azure-iot-sdk.git?rev=e707ee7fc899afe4a8747998a7779840676a476a#e707ee7fc899afe4a8747998a7779840676a476a"
+source = "git+ssh://git@github.com/JanZachmann/azure-iot-sdk.git?rev=d0d0364fef77ac9fed0c2457d7922f70d56632c7#d0d0364fef77ac9fed0c2457d7922f70d56632c7"
 dependencies = [
  "azure-iot-sdk-sys",
  "eis-utils",
@@ -385,7 +385,7 @@ dependencies = [
 [[package]]
 name = "eis-utils"
 version = "0.2.1"
-source = "git+ssh://git@github.com/JanZachmann/eis-utils.git?rev=e8dd31e2d91802a678500f39a9e319b483c35a72#e8dd31e2d91802a678500f39a9e319b483c35a72"
+source = "git+ssh://git@github.com/JanZachmann/eis-utils.git?rev=dab3d72a94527e9a55dc65c6380e38650f9c0683#dab3d72a94527e9a55dc65c6380e38650f9c0683"
 dependencies = [
  "aziot-cert-client-async",
  "aziot-cert-common",
@@ -824,7 +824,7 @@ dependencies = [
 
 [[package]]
 name = "iot-client-template-rs"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "azure-iot-sdk",
  "env_logger 0.8.4",

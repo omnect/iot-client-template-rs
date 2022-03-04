@@ -1,9 +1,7 @@
 use crate::{Client, Message};
-use azure_iot_sdk::client::*;
-use azure_iot_sdk::message::*;
+use azure_iot_sdk::{client::*, message::*, IotError};
 use serde_json::json;
 use std::collections::HashMap;
-use std::error::Error;
 use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 
@@ -42,7 +40,7 @@ pub fn get_direct_methods(
 
 fn func_params_as_result(
     in_json: serde_json::Value,
-) -> Result<Option<serde_json::Value>, Box<dyn Error + Send + Sync>> {
+) -> Result<Option<serde_json::Value>, IotError> {
     let out_json = json!({
         "called function": "func_params_as_result",
         "your param was": in_json

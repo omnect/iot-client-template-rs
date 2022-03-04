@@ -1,10 +1,6 @@
-use azure_iot_sdk::client::*;
-use azure_iot_sdk::message::*;
-use azure_iot_sdk::twin::Twin;
-use azure_iot_sdk::IotError;
+use azure_iot_sdk::{client::*, message::*, twin::Twin, IotError};
 use log::debug;
 use std::collections::HashMap;
-use std::error::Error;
 use std::sync::{mpsc::Receiver, mpsc::Sender, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
@@ -52,7 +48,7 @@ impl EventHandler for ClientEventHandler {
         &self,
         state: TwinUpdateState,
         desired: serde_json::Value,
-    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+    ) -> Result<(), IotError> {
         self.tx.send(Message::Desired(state, desired))?;
 
         Ok(())
@@ -122,7 +118,7 @@ impl Client {
             Ok(())
         }));
     }
-    pub fn stop(self) -> Result<(), Box<dyn Error + Send + Sync>> {
+    pub fn stop(self) -> Result<(), IotError> {
         *self.run.lock().unwrap() = false;
 
         self.thread.map_or(Ok(()), |t| t.join().unwrap())
@@ -130,9 +126,7 @@ impl Client {
 
     pub fn make_direct_method<'a, F>(f: F) -> DirectMethod
     where
-        F: Fn(serde_json::Value) -> Result<Option<serde_json::Value>, Box<dyn Error + Send + Sync>>
-            + 'static
-            + Send,
+        F: Fn(serde_json::Value) -> Result<Option<serde_json::Value>, IotError> + 'static + Send,
     {
         Box::new(f) as DirectMethod
     }
