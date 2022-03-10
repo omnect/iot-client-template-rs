@@ -9,8 +9,7 @@ license = "MIT OR Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-#azure-iot-sdk = { git = "ssh://git@github.com/JanZachmann/azure-iot-sdk.git", tag = "0.5.2" }
-azure-iot-sdk = { path = "../azure-iot-sdk" }
+azure-iot-sdk = { git = "ssh://git@github.com/JanZachmann/azure-iot-sdk.git", tag = "0.5.2" }
 serde_json = "1.0"
 env_logger = "0.8"
 log = "0.4"
