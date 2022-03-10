@@ -1,15 +1,3 @@
-//! Template and example showing how to setup an iot application based on azure iot device or module twin.
-//!
-//! Provides an abstraction over a queue.  When the abstraction is used
-//! there are these advantages:
-//! - Fast
-//! - [`Easy`]
-//!
-//! [`Easy`]: http://thatwaseasy.example.com
-
-/// This module makes it easy.
-///
-
 #[cfg(not(any(feature = "device_twin", feature = "module_twin")))]
 compile_error!(
     "Either feature \"device_twin\" xor \"module_twin\" must be enabled for this crate."
@@ -20,19 +8,13 @@ compile_error!(
     "Either feature \"device_twin\" xor \"module_twin\" must be enabled for this crate."
 );
 
-#[cfg(feature = "device_twin")]
-type TwinType = DeviceTwin;
-
-#[cfg(feature = "module_twin")]
-type TwinType = ModuleTwin;
-
 pub mod client;
 pub mod direct_methods;
 pub mod message;
 #[cfg(feature = "systemd")]
 pub mod systemd;
 pub mod twin;
-use azure_iot_sdk::{twin::*, IotError};
+use azure_iot_sdk::client::*;
 use client::{Client, Message};
 use log::debug;
 use std::sync::{mpsc, Arc, Mutex};
@@ -44,7 +26,13 @@ pub fn run() -> Result<(), IotError> {
     let tx_app2client = Arc::new(Mutex::new(tx_app2client));
     let methods = direct_methods::get_direct_methods(Arc::clone(&tx_app2client));
 
-    client.run::<TwinType>(None, methods, tx_client2app, rx_app2client);
+    let twin_type = if cfg!(feature = "device_twin") {
+        TwinType::Device
+    } else {
+        TwinType::Module
+    };
+
+    client.run(twin_type, None, methods, tx_client2app, rx_app2client);
 
     for msg in rx_client2app {
         match msg {

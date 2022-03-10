@@ -31,7 +31,7 @@ This project shows a basic skeleton for an initial implementation of a Rust base
 2. **Device/Module twin**: [message.rs](src/message.rs) implements logic that demonstrates how the client twin can be utilized in applications. As an example desired properties are directly sent back as reported properties.
 3. **Direct methods**: [direct_methods.rs](src/direct_methods.rs) implements two functions that serve as direct method and can be synchronously called by iot-hub:
    1. `closure_send_d2c_message`: A closure that doesn't take a parameter and doesn't return a result. The method triggers an outgoing D2C message (@see **3. D2C message**).
-   2. `func_echo_params_as_result`: A function that takes a parameter and returns the same parameter as result.
+   2. `mirror_func_params_as_result`: A function that takes a parameter and returns the same parameter as result.
 4. **Device to cloud messages (D2C)**: In [direct_methods.rs](src/direct_methods.rs) there is a direct method call named `closure_send_d2c_message`. It shows how to send a D2C telemetry event to iot-hub.
 5. **Cloud to device messages (C2D)**: [message.rs](src/message.rs) demonstrates how the application receives messages sent from cloud. As an example the content of the received message is logged to the console. In order to test that functionality it is the easiest way to configure the application as `device_twin` and send a message from [iot-explorer](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer).
 
@@ -50,6 +50,7 @@ In order to enable the communication between client and cloud a device or module
 
 ```   
    client.run::<TwinType>(
+      TwinType::Module,
       Some("your connection string"),
       Some(methods),
       tx_client2app,
