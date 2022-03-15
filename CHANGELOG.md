@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.4] Q1 2022
  - documentation
  - added Cargo.audit.ignore
- - update to azure-iot-sdk 0.5.2
+ - update to azure-iot-sdk 0.5.3
 
 ## [0.2.3] Q1 2022
  - add device twin example
