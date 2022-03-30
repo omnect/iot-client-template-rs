@@ -1,13 +1,23 @@
-# iot-client-template-rs
-
-## What is iot-client-template-rs?
+# What is iot-client-template-rs?
 
 This `iot-client-template-rs` repository provides code to develop Rust based Azure IoT device applications. There are 3 basic approaches to implement Azure compliant device applications:
 1. [device twin](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-device-twins): native application representing the device and thus only exists once on a device.
 2. [module twin](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-module-twins): native application representing a certain application on the device.
 3. [IoTEdge modules](https://docs.microsoft.com/en-us/azure/iot-edge/module-development?view=iotedge-2020-11): **these modules are, not part of this repository**. They are containerized applications running in the IoTEdge runtime. In order to develop C/C++ based IoTEdge modules for ICS_DeviceManagement refer to the [iotedge-module-template](https://github.com/ICS-DeviceManagement/iotedge-module-template) repository.
 
-## Configure build
+# Build
+
+Please refer to [azure-iot-sdk-sys](https://github.com/ICS-DeviceManagement/azure-iot-sdk-sys/blob/main/README.md) documentation in order to provide mandatory libraries needed to build `iot-client-template-rs` successfully.
+
+An error output similar to the following example indicates that libraries are not set correctly:
+>error: failed to run custom build command for `azure-iot-sdk-sys v0.2.2 (ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk-sys.git?tag=0.2.2#0357acbf)`
+>
+>Caused by:
+>  process didn't exit successfully: `/home/osboxes/projects/azure-iot-sdk/target/debug/build/azure-iot-sdk-sys-35a448ef75c7b5ee/build-script-build` (exit status: 101)
+>  --- stderr
+>  thread 'main' panicked at 'env LIB_PATH_AZURESDK is not available: NotPresent', /home/osboxes/.cargo/git/checkouts/azure-iot-sdk-sys-13093a02cfa1dea4/0357acb/build.rs:11:30
+
+## Configure build options
 
 In your [Cargo.toml](Cargo.toml) file you can configure some common features to be used for `iot-client-template-rs` build.
 
@@ -23,7 +33,7 @@ The `systemd` feature is an optional feature which is enabled by default. If it 
 1. notiy SystemManager when ready (`systemd-notify ready=1`)
 2. check if systemd watchdog is enabled (`sd_watchdog_enabled`) and notify SystemManager (`notify watchdog=1`) within the configured watchdog timeout.
 
-## Template and example code
+# Template and example code
 
 This project shows a basic skeleton for an initial implementation of a Rust based iot device client. It demonstrates how to make use of our Rust [azure-iot-sdk](https://github.com/ICS-DeviceManagement/azure-iot-sdk) in order to connect to Azure iot-hub. Moreover there are examples to show basic communication patterns:
 
@@ -37,11 +47,11 @@ This project shows a basic skeleton for an initial implementation of a Rust base
 
 All examples can be tested via [iot-explorer](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer) or directly via iot-hub view in your Azure portal.
 
-## Platform integration
+# Platform integration
 
 Both of the supported ICS_DeviceManagement targets - [yocto](https://github.com/ICS-DeviceManagement/meta-ics-dm) and [simulator](https://github.com/ICS-DeviceManagement/simulator) - integrate the `iot-client-template-rs` and serve as an example for device integration.
 
-## Client identity creation in Azure iot-hub
+# Client identity creation in Azure iot-hub
 
 In order to enable the communication between client and cloud a device or module identity needs to be created in Azure iot-hub.
 
@@ -57,14 +67,14 @@ In order to enable the communication between client and cloud a device or module
       rx_app2client,
    );  
 ```
-## License
+# License
 
 Licensed under either of
 * Apache License, Version 2.0, (./LICENSE-APACHE or <http://www.apache.org/licenses/LICENSE-2.0>)
 * MIT license (./LICENSE-MIT or <http://opensource.org/licenses/MIT>)
 at your option.
 
-## Contribution
+# Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally
 submitted for inclusion in the work by you, as defined in the Apache-2.0

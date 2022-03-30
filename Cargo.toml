@@ -9,11 +9,11 @@ license = "MIT OR Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-azure-iot-sdk = { git = "ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk.git", tag = "0.5.3" }
+azure-iot-sdk = { git = "ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk.git", tag = "0.5.5" }
 serde_json = "1.0"
 env_logger = "0.8"
 log = "0.4"
-sd-notify = { git = "ssh://git@github.com/ICS-DeviceManagement/sd-notify.git", tag = "v0.5.0", optional = true }
+sd-notify = { version = "0.5.*", optional = true }
 
 [features]
 # select either "device_twin" or "module_twin" functionality

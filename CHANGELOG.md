@@ -6,9 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.2.4] Q1 2022
- - documentation
+ - improved build documentation in readme
  - added Cargo.audit.ignore
- - update to azure-iot-sdk 0.5.3
+ - update to azure-iot-sdk 0.5.5
+ - update to official sd_notify crate 0.5.0
 
 ## [0.2.3] Q1 2022
  - add device twin example
