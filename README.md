@@ -59,7 +59,7 @@ In order to enable the communication between client and cloud a device or module
 2. **Manual identity creation and connection string**: As an alternative you might create your device or modules manually in iot-hub and pass the corresponding connection string to the `client.run()` call in [lib.rs](src/lib.rs):
 
 ```   
-   client.run::<TwinType>(
+   client.run(
       TwinType::Module,
       Some("your connection string"),
       Some(methods),
