@@ -13,8 +13,6 @@ azure-iot-sdk = { git = "ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk
 serde_json = "1.0"
 env_logger = "0.8"
 log = "0.4"
-# use sd-notify from crates.io as soon as posible
-# sd-notify = { version = "0.5.*", optional = true }
 sd-notify = { git = "ssh://git@github.com/ICS-DeviceManagement/sd-notify.git", tag = "v0.5.0", optional = true }
 
 [features]
