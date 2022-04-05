@@ -1,9 +1,5 @@
 use azure_iot_sdk::client::*;
-use azure_iot_sdk::message::*;
-use azure_iot_sdk::twin::Twin;
 use log::debug;
-use std::collections::HashMap;
-use std::error::Error;
 use std::sync::{mpsc::Receiver, mpsc::Sender, Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
@@ -24,7 +20,7 @@ pub enum Message {
 }
 
 struct ClientEventHandler {
-    direct_methods: Option<HashMap<String, DirectMethod>>,
+    direct_methods: Option<DirectMethodMap>,
     tx: Sender<Message>,
 }
 
@@ -38,7 +34,7 @@ impl EventHandler for ClientEventHandler {
         }
     }
 
-    fn handle_c2d_message(&self, message: IotMessage) -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn handle_c2d_message(&self, message: IotMessage) -> Result<(), IotError> {
         self.tx.send(Message::C2D(message))?;
         Ok(())
     }
@@ -51,19 +47,19 @@ impl EventHandler for ClientEventHandler {
         &self,
         state: TwinUpdateState,
         desired: serde_json::Value,
-    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+    ) -> Result<(), IotError> {
         self.tx.send(Message::Desired(state, desired))?;
 
         Ok(())
     }
 
-    fn get_direct_methods(&self) -> Option<&HashMap<String, DirectMethod>> {
+    fn get_direct_methods(&self) -> Option<&DirectMethodMap> {
         self.direct_methods.as_ref()
     }
 }
 
 pub struct Client {
-    thread: Option<JoinHandle<Result<(), Box<dyn Error + Send + Sync + Send + Sync>>>>,
+    thread: Option<JoinHandle<Result<(), IotError>>>,
     run: Arc<Mutex<bool>>,
 }
 
@@ -75,10 +71,11 @@ impl Client {
         }
     }
 
-    pub fn run<T: Twin>(
+    pub fn run(
         &mut self,
+        twin_type: TwinType,
         connection_string: Option<&'static str>,
-        direct_methods: Option<HashMap<String, DirectMethod>>,
+        direct_methods: Option<DirectMethodMap>,
         tx: Sender<Message>,
         rx: Receiver<Message>,
     ) {
@@ -86,55 +83,44 @@ impl Client {
 
         let running = Arc::clone(&self.run);
 
-        self.thread = Some(thread::spawn(
-            move || -> Result<(), Box<dyn Error + Send + Sync + Send + Sync>> {
-                let hundred_millis = time::Duration::from_millis(100);
-                let event_handler = ClientEventHandler { direct_methods, tx };
+        self.thread = Some(thread::spawn(move || -> Result<(), IotError> {
+            let hundred_millis = time::Duration::from_millis(100);
+            let event_handler = ClientEventHandler { direct_methods, tx };
 
-                let mut client = match connection_string {
-                    Some(cs) => IotHubClient::<T>::from_connection_string(cs, event_handler)?,
-                    _ => IotHubClient::from_identity_service(event_handler)?,
+            let mut client = match connection_string {
+                Some(cs) => IotHubClient::from_connection_string(twin_type, cs, event_handler)?,
+                _ => IotHubClient::from_identity_service(twin_type, event_handler)?,
+            };
+
+            #[cfg(feature = "systemd")]
+            let mut wdt = WatchdogHandler::default();
+
+            #[cfg(feature = "systemd")]
+            wdt.init()?;
+
+            while *running.lock().unwrap() {
+                match rx.recv_timeout(hundred_millis) {
+                    Ok(Message::Reported(reported)) => client.send_reported_state(reported)?,
+                    Ok(Message::D2C(telemetry)) => {
+                        client.send_d2c_message(telemetry).map(|_| ())?
+                    }
+                    Ok(Message::Terminate) => return Ok(()),
+                    Ok(_) => debug!("Client received unhandled message"),
+                    Err(_) => (),
                 };
 
-                #[cfg(feature = "systemd")]
-                let mut wdt = WatchdogHandler::default();
+                client.do_work();
 
                 #[cfg(feature = "systemd")]
-                wdt.init()?;
+                wdt.notify()?;
+            }
 
-                while *running.lock().unwrap() {
-                    match rx.recv_timeout(hundred_millis) {
-                        Ok(Message::Reported(reported)) => client.send_reported_state(reported)?,
-                        Ok(Message::D2C(telemetry)) => {
-                            client.send_d2c_message(telemetry).map(|_| ())?
-                        }
-                        Ok(Message::Terminate) => return Ok(()),
-                        Ok(_) => debug!("Client received unhandled message"),
-                        Err(_) => (),
-                    };
-
-                    client.do_work();
-
-                    #[cfg(feature = "systemd")]
-                    wdt.notify()?;
-                }
-
-                Ok(())
-            },
-        ));
+            Ok(())
+        }));
     }
-    pub fn stop(self) -> Result<(), Box<dyn Error + Send + Sync>> {
+    pub fn stop(self) -> Result<(), IotError> {
         *self.run.lock().unwrap() = false;
 
         self.thread.map_or(Ok(()), |t| t.join().unwrap())
-    }
-
-    pub fn make_direct_method<'a, F>(f: F) -> DirectMethod
-    where
-        F: Fn(serde_json::Value) -> Result<Option<serde_json::Value>, Box<dyn Error + Send + Sync>>
-            + 'static
-            + Send,
-    {
-        Box::new(f) as DirectMethod
     }
 }

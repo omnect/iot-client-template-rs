@@ -1,19 +1,15 @@
-use crate::{Client, Message};
+use crate::Message;
 use azure_iot_sdk::client::*;
-use azure_iot_sdk::message::*;
 use serde_json::json;
-use std::collections::HashMap;
-use std::error::Error;
 use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 
-pub fn get_direct_methods(
-    tx_app2client: Arc<Mutex<Sender<Message>>>,
-) -> Option<HashMap<String, DirectMethod>> {
-    let mut methods = HashMap::new();
+pub fn get_direct_methods(tx_app2client: Arc<Mutex<Sender<Message>>>) -> Option<DirectMethodMap> {
+    let mut methods = DirectMethodMap::new();
+
     methods.insert(
         String::from("closure_send_d2c_message"),
-        Client::make_direct_method(move |_in_json| {
+        IotHubClient::make_direct_method(move |_in_json| {
             let msg = IotMessage::builder()
                 .set_body(
                     serde_json::to_vec(r#"{"my telemetry message": "hi from device"}"#).unwrap(),
@@ -27,24 +23,27 @@ pub fn get_direct_methods(
                 .set_output_queue(String::from("my output queue"))
                 .build();
 
-            tx_app2client.lock().unwrap().send(Message::D2C(msg)).unwrap();
+            tx_app2client
+                .lock()
+                .unwrap()
+                .send(Message::D2C(msg))
+                .unwrap();
             Ok(None)
         }),
     );
-
     methods.insert(
         String::from("func_echo_params_as_result"),
-        Box::new(func_params_as_result),
+        Box::new(mirror_func_params_as_result),
     );
 
     Some(methods)
 }
 
-fn func_params_as_result(
+fn mirror_func_params_as_result(
     in_json: serde_json::Value,
-) -> Result<Option<serde_json::Value>, Box<dyn Error + Send + Sync>> {
+) -> Result<Option<serde_json::Value>, IotError> {
     let out_json = json!({
-        "called function": "func_params_as_result",
+        "called function": "mirror_func_params_as_result",
         "your param was": in_json
     });
 
