@@ -30,7 +30,7 @@ You have to choose which flavour of iot client you want to build. Thus add one o
 ### systemd integration
 
 The `systemd` feature is an optional feature which is enabled by default. If it is configured `iot-client-template-rs` will:
-1. notiy SystemManager when ready (`systemd-notify ready=1`)
+1. notify SystemManager when ready (`systemd-notify ready=1`)
 2. check if systemd watchdog is enabled (`sd_watchdog_enabled`) and notify SystemManager (`notify watchdog=1`) within the configured watchdog timeout.
 
 # Template and example code
