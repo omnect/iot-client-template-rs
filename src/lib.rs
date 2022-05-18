@@ -1,13 +1,3 @@
-#[cfg(not(any(feature = "device_twin", feature = "module_twin")))]
-compile_error!(
-    "Either feature \"device_twin\" xor \"module_twin\" must be enabled for this crate."
-);
-
-#[cfg(all(feature = "device_twin", feature = "module_twin"))]
-compile_error!(
-    "Either feature \"device_twin\" xor \"module_twin\" must be enabled for this crate."
-);
-
 pub mod client;
 pub mod direct_methods;
 pub mod message;
@@ -26,13 +16,7 @@ pub fn run() -> Result<(), IotError> {
     let tx_app2client = Arc::new(Mutex::new(tx_app2client));
     let methods = direct_methods::get_direct_methods(Arc::clone(&tx_app2client));
 
-    let twin_type = if cfg!(feature = "device_twin") {
-        TwinType::Device
-    } else {
-        TwinType::Module
-    };
-
-    client.run(twin_type, None, methods, tx_client2app, rx_app2client);
+    client.run(None, methods, tx_client2app, rx_app2client);
 
     for msg in rx_client2app {
         match msg {

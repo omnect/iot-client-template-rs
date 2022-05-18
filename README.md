@@ -7,6 +7,8 @@ This `iot-client-template-rs` repository provides code to develop Rust based Azu
 
 # Build
 
+ToDO
+
 Please refer to [azure-iot-sdk-sys](https://github.com/ICS-DeviceManagement/azure-iot-sdk-sys/blob/main/README.md) documentation in order to provide mandatory libraries needed to build `iot-client-template-rs` successfully.
 
 An error output similar to the following example indicates that libraries are not set correctly:

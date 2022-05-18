@@ -1,6 +1,6 @@
 [package]
 name = "iot-client-template-rs"
-version = "0.2.4"
+version = "0.3.0"
 edition = "2021"
 authors = ["Joerg Zeidler <joerg.zeidler@conplement.de>", "Jan Zachmann <jan.zachmann@conplement.de>"]
 repository = "git@github.com:ICS-DeviceManagement/iot-client-template-rs.git"
@@ -9,16 +9,13 @@ license = "MIT OR Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-azure-iot-sdk = { git = "ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk.git", tag = "0.5.5" }
+azure-iot-sdk = { git = "ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk.git", tag = "0.8.0", features = ["module_twin"] }
+sd-notify = { git = "ssh://git@github.com/ICS-DeviceManagement/sd-notify.git", tag = "v0.5.0", optional = true }
 serde_json = "1.0"
 env_logger = "0.8"
 log = "0.4"
-sd-notify = { git = "ssh://git@github.com/ICS-DeviceManagement/sd-notify.git", tag = "v0.5.0", optional = true }
 
 [features]
-# select either "device_twin" or "module_twin" functionality
 # select if systemd ready and watchdog should be enabled
-default = ["module_twin", "systemd"]
-systemd = ["sd-notify"]
-device_twin = []
-module_twin = []
+default = ["systemd"]
+systemd = ["dep:sd-notify"]

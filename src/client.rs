@@ -73,7 +73,6 @@ impl Client {
 
     pub fn run(
         &mut self,
-        twin_type: TwinType,
         connection_string: Option<&'static str>,
         direct_methods: Option<DirectMethodMap>,
         tx: Sender<Message>,
@@ -87,16 +86,22 @@ impl Client {
             let hundred_millis = time::Duration::from_millis(100);
             let event_handler = ClientEventHandler { direct_methods, tx };
 
-            let mut client = match connection_string {
-                Some(cs) => IotHubClient::from_connection_string(twin_type, cs, event_handler)?,
-                _ => IotHubClient::from_identity_service(twin_type, event_handler)?,
-            };
-
             #[cfg(feature = "systemd")]
             let mut wdt = WatchdogHandler::default();
 
             #[cfg(feature = "systemd")]
             wdt.init()?;
+
+            let mut client = match IotHubClient::get_twin_type() {
+                _ if connection_string.is_some() => IotHubClient::from_connection_string(
+                    connection_string.unwrap(),
+                    event_handler,
+                )?,
+                TwinType::Device | TwinType::Module => {
+                    IotHubClient::from_identity_service(event_handler)?
+                }
+                TwinType::Edge => IotHubClient::from_edge_environment(event_handler)?,
+            };
 
             while *running.lock().unwrap() {
                 match rx.recv_timeout(hundred_millis) {
