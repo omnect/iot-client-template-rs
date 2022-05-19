@@ -34,7 +34,7 @@ dependencies = [
 [[package]]
 name = "azure-iot-sdk"
 version = "0.8.0"
-source = "git+ssh://git@github.com/JanZachmann/azure-iot-sdk.git?branch=iot_edge_support#15049acd727817c1e00b9072ae31956479e422f6"
+source = "git+ssh://git@github.com/JanZachmann/azure-iot-sdk.git?branch=iot_edge_support#8db7f19a2d75ab1b5ea0647e04da748329cd4f63"
 dependencies = [
  "azure-iot-sdk-sys",
  "log",
