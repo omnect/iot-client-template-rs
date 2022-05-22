@@ -183,7 +183,7 @@ dependencies = [
 [[package]]
 name = "azure-iot-sdk"
 version = "0.8.0"
-source = "git+ssh://git@github.com/JanZachmann/azure-iot-sdk.git?branch=iot_edge_support#8db7f19a2d75ab1b5ea0647e04da748329cd4f63"
+source = "git+ssh://git@github.com/JanZachmann/azure-iot-sdk.git#31c04340815a02cb5adc3daa7a8f0b92bc8971da"
 dependencies = [
  "azure-iot-sdk-sys",
  "eis-utils",
@@ -195,7 +195,7 @@ dependencies = [
 [[package]]
 name = "azure-iot-sdk-sys"
 version = "0.3.0"
-source = "git+ssh://git@github.com/JanZachmann/azure-iot-sdk-sys.git?branch=iotedge_support#fc6da4853834e0033fc9b7c1326b5119bdbf2652"
+source = "git+ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk-sys.git?tag=0.3.0#f2c05d51392d86a85f6d4115e7faa8d7ea642ec8"
 dependencies = [
  "bindgen",
  "glob",
