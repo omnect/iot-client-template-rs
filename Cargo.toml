@@ -21,7 +21,7 @@ log = "0.4"
 [features]
 # select if systemd ready and watchdog should be enabled
 default = ["edge_client", "systemd"]
-systemd = ["dep:sd-notify"]
+systemd = ["sd-notify"]
 device_client = ["azure-iot-sdk/device_client"]
 module_client = ["azure-iot-sdk/module_client"]
 edge_client = ["azure-iot-sdk/edge_client"]
