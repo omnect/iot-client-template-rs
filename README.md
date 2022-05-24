@@ -3,11 +3,11 @@
 This `iot-client-template-rs` repository provides code to develop Rust based Azure IoT device applications. There are 3 basic approaches to implement Azure compliant device applications:
 1. [device twin](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-device-twins): native application representing the device and thus only exists once on a device.
 2. [module twin](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-module-twins): native application representing a certain application on the device.
-3. [IoTEdge modules](https://docs.microsoft.com/en-us/azure/iot-edge/module-development?view=iotedge-2020-11): containerized applications running in the IoTEdge runtime. ??? add link to iotedge-client-template-rs ???
+3. [IoTEdge modules](https://docs.microsoft.com/en-us/azure/iot-edge): containerized applications running on device IoTEdge runtime.
 
 # Build
 
-ToDO
+## Library dependencies
 
 Please refer to [azure-iot-sdk-sys](https://github.com/ICS-DeviceManagement/azure-iot-sdk-sys/blob/main/README.md) documentation in order to provide mandatory libraries needed to build `iot-client-template-rs` successfully.
 
@@ -21,13 +21,14 @@ An error output similar to the following example indicates that libraries are no
 
 ## Configure build options
 
-In your [Cargo.toml](Cargo.toml) file you can configure some common features to be used for `iot-client-template-rs` build.
+First of all you might have to configure `client type` and `systemd` usage in [Cargo.toml](Cargo.toml) file to be used for `iot-client-template-rs` build.
 
-### Twin type
-todo
-You have to choose which flavour of iot client you want to build. Thus add one of these twin types to your default features:
-1. `device_twin` ([currently not supported with TPM attestation](https://azure.github.io/iot-identity-service/develop-an-agent.html#connecting-your-agent-to-iot-hub))
-2. `module_twin` (configured as default)
+### Client type
+
+You have to choose which flavour of iot client you want to build. Thus set one of these client types in your default features:
+1. `device_client` ([currently not supported with TPM attestation](https://azure.github.io/iot-identity-service/develop-an-agent.html#connecting-your-agent-to-iot-hub))
+2. `module_client` (default)
+3. `edge_client` 
 
 ### systemd integration
 
@@ -55,7 +56,8 @@ Both of the supported ICS_DeviceManagement targets - [yocto](https://github.com/
 
 # Client identity creation in Azure iot-hub
 
-In order to enable the communication between client and cloud a device or module identity needs to be created in Azure iot-hub.
+In order to enable the communication between client and cloud a device or module identity needs to be created in Azure iot-hub.<br>
+***Note: This only applies to client types device_client and module_client (clients of type edge_client connect via edge runtime).***
 
 1. **Client identity creation on device via Azure Identity Service (AIS)**: In case your device integrates [AIS](https://azure.github.io/iot-identity-service/), the module creation will be managed automatically on demand. ICS_DeviceManagement yocto layer and simulator support AIS by default.
 2. **Manual identity creation and connection string**: As an alternative you might create your device or modules manually in iot-hub and pass the corresponding connection string to the `client.run()` call in [lib.rs](src/lib.rs):
