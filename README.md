@@ -21,7 +21,7 @@ An error output similar to the following example indicates that libraries are no
 
 ## Configure build options
 
-First of all you might have to configure `client type` and `systemd` usage in [Cargo.toml](Cargo.toml) file to be used for `iot-client-template-rs` build.
+First of all you might have to configure [client type](###-client-type) and [systemd](###-systemd-integration) usage in [Cargo.toml](Cargo.toml) file to be used for `iot-client-template-rs` build.
 
 ### Client type
 
