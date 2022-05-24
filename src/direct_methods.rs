@@ -14,14 +14,12 @@ pub fn get_direct_methods(tx_app2client: Arc<Mutex<Sender<Message>>>) -> Option<
                 .set_body(
                     serde_json::to_vec(r#"{"my telemetry message": "hi from device"}"#).unwrap(),
                 )
-                .set_id(String::from("my msg id"))
-                .set_correlation_id(String::from("my correleation id"))
-                .set_property(
-                    String::from("my property key"),
-                    String::from("my property value"),
-                )
-                .set_output_queue(String::from("my output queue"))
-                .build();
+                .set_id("my msg id")
+                .set_correlation_id("my correleation id")
+                .set_property("my property key", "my property value")
+                .set_output_queue("my output queue")
+                .build()
+                .unwrap();
 
             tx_app2client
                 .lock()

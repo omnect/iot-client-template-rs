@@ -3,9 +3,11 @@
 This `iot-client-template-rs` repository provides code to develop Rust based Azure IoT device applications. There are 3 basic approaches to implement Azure compliant device applications:
 1. [device twin](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-device-twins): native application representing the device and thus only exists once on a device.
 2. [module twin](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-module-twins): native application representing a certain application on the device.
-3. [IoTEdge modules](https://docs.microsoft.com/en-us/azure/iot-edge/module-development?view=iotedge-2020-11): **these modules are, not part of this repository**. They are containerized applications running in the IoTEdge runtime. In order to develop C/C++ based IoTEdge modules for ICS_DeviceManagement refer to the [iotedge-module-template](https://github.com/ICS-DeviceManagement/iotedge-module-template) repository.
+3. [IoTEdge modules](https://docs.microsoft.com/en-us/azure/iot-edge): containerized applications running on device IoTEdge runtime.
 
 # Build
+
+## Library dependencies
 
 Please refer to [azure-iot-sdk-sys](https://github.com/ICS-DeviceManagement/azure-iot-sdk-sys/blob/main/README.md) documentation in order to provide mandatory libraries needed to build `iot-client-template-rs` successfully.
 
@@ -19,13 +21,14 @@ An error output similar to the following example indicates that libraries are no
 
 ## Configure build options
 
-In your [Cargo.toml](Cargo.toml) file you can configure some common features to be used for `iot-client-template-rs` build.
+First of all you might have to configure [client type](#client-type) and [systemd](#systemd-integration) usage in [Cargo.toml](Cargo.toml) file to be used for `iot-client-template-rs` build.
 
-### Twin type
+### Client type
 
-You have to choose which flavour of iot client you want to build. Thus add one of these twin types to your default features:
-1. `device_twin` ([currently not supported with TPM attestation](https://azure.github.io/iot-identity-service/develop-an-agent.html#connecting-your-agent-to-iot-hub))
-2. `module_twin` (configured as default)
+You have to choose which flavour of iot client you want to build. Thus set one of these client types in your default features:
+1. `device_client` ([currently not supported with TPM attestation](https://azure.github.io/iot-identity-service/develop-an-agent.html#connecting-your-agent-to-iot-hub))
+2. `module_client` (default)
+3. `edge_client` 
 
 ### systemd integration
 
@@ -38,7 +41,7 @@ The `systemd` feature is an optional feature which is enabled by default. If it 
 This project shows a basic skeleton for an initial implementation of a Rust based iot device client. It demonstrates how to make use of our Rust [azure-iot-sdk](https://github.com/ICS-DeviceManagement/azure-iot-sdk) in order to connect to Azure iot-hub. Moreover there are examples to show basic communication patterns:
 
 1. **Client**: [client.rs](src/client.rs) implements basic logic needed to communicate with iot-hub. Therefore the `EventHandler` trait is implemented in order to receive new desired properties, direct method calls or cloud to device (C2D) messages from iot-hub. Further the client provides a message channel to send reported properities and device to cloud messages (D2C) to iot-hub.
-2. **Device/Module twin**: [message.rs](src/message.rs) implements logic that demonstrates how the client twin can be utilized in applications. As an example desired properties are directly sent back as reported properties.
+2. **Twin properties**: [message.rs](src/message.rs) implements logic that demonstrates how the client twin can be utilized in applications. As an example desired properties are directly sent back as reported properties.
 3. **Direct methods**: [direct_methods.rs](src/direct_methods.rs) implements two functions that serve as direct method and can be synchronously called by iot-hub:
    1. `closure_send_d2c_message`: A closure that doesn't take a parameter and doesn't return a result. The method triggers an outgoing D2C message (@see **3. D2C message**).
    2. `mirror_func_params_as_result`: A function that takes a parameter and returns the same parameter as result.
@@ -53,14 +56,14 @@ Both of the supported ICS_DeviceManagement targets - [yocto](https://github.com/
 
 # Client identity creation in Azure iot-hub
 
-In order to enable the communication between client and cloud a device or module identity needs to be created in Azure iot-hub.
+In order to enable the communication between client and cloud a device or module identity needs to be created in Azure iot-hub.<br>
+***Note: This only applies to client types device_client and module_client (clients of type edge_client connect via edge runtime).***
 
 1. **Client identity creation on device via Azure Identity Service (AIS)**: In case your device integrates [AIS](https://azure.github.io/iot-identity-service/), the module creation will be managed automatically on demand. ICS_DeviceManagement yocto layer and simulator support AIS by default.
 2. **Manual identity creation and connection string**: As an alternative you might create your device or modules manually in iot-hub and pass the corresponding connection string to the `client.run()` call in [lib.rs](src/lib.rs):
 
 ```   
    client.run(
-      TwinType::Module,
       Some("your connection string"),
       Some(methods),
       tx_client2app,
