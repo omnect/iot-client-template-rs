@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] Q2 2022
+ - fixed readme 
+
 ## [0.3.0] Q2 2022
  - bumb to azure-iot-sdk 0.8.0:
    - extend sample to demonstrate iot edge module feature
