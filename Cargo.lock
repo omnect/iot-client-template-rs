@@ -182,8 +182,8 @@ dependencies = [
 
 [[package]]
 name = "azure-iot-sdk"
-version = "0.8.0"
-source = "git+ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk.git?tag=0.8.0#21c4d345093ad85318d2efe00a4aac33ebb1b950"
+version = "0.8.1"
+source = "git+ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk.git?tag=0.8.1#7cbf5c2eebc8050485fa65baaf96f726f4ca0bce"
 dependencies = [
  "azure-iot-sdk-sys",
  "eis-utils",
@@ -194,11 +194,11 @@ dependencies = [
 
 [[package]]
 name = "azure-iot-sdk-sys"
-version = "0.3.0"
-source = "git+ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk-sys.git?tag=0.3.0#f2c05d51392d86a85f6d4115e7faa8d7ea642ec8"
+version = "0.4.0"
+source = "git+ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk-sys.git?tag=0.4.0#62afd62aeeb00f5cb8c22a8f56691e4002f1f1f9"
 dependencies = [
  "bindgen",
- "glob",
+ "pkg-config",
 ]
 
 [[package]]
@@ -800,7 +800,7 @@ dependencies = [
 
 [[package]]
 name = "iot-client-template-rs"
-version = "0.3.0"
+version = "0.3.2"
 dependencies = [
  "azure-iot-sdk",
  "env_logger 0.8.4",
