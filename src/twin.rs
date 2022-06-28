@@ -1,5 +1,6 @@
 use crate::Message;
 use azure_iot_sdk::client::*;
+use serde_json::json;
 use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 
@@ -20,4 +21,15 @@ pub fn update(
             .send(Message::Reported(serde_json::Value::Object(map)))
             .unwrap();
     }
+}
+
+pub fn report_version(tx_app2client: Arc<Mutex<Sender<Message>>>) -> Result<(), IotError> {
+    tx_app2client
+        .lock()
+        .unwrap()
+        .send(Message::Reported(json!({
+            "module-version": env!("CARGO_PKG_VERSION")
+        })))?;
+
+    Ok(())
 }

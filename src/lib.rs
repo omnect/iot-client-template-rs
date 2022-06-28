@@ -6,10 +6,11 @@ pub mod systemd;
 pub mod twin;
 use azure_iot_sdk::client::*;
 use client::{Client, Message};
-use log::debug;
+use log::{debug, error};
 use std::sync::{mpsc, Arc, Mutex};
 
-pub fn run() -> Result<(), IotError> {
+#[tokio::main]
+pub async fn run() -> Result<(), IotError> {
     let mut client = Client::new();
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
@@ -23,9 +24,13 @@ pub fn run() -> Result<(), IotError> {
             Message::Authenticated => {
                 #[cfg(feature = "systemd")]
                 systemd::notify_ready();
+
+                if let Err(e) = twin::report_version(Arc::clone(&tx_app2client)) {
+                    error!("Couldn't report version: {}", e);
+                }
             }
             Message::Unauthenticated(reason) => {
-                client.stop().unwrap();
+                client.stop().await.unwrap();
                 return Err(IotError::from(format!(
                     "No connection. Reason: {:?}",
                     reason
@@ -41,5 +46,5 @@ pub fn run() -> Result<(), IotError> {
         }
     }
 
-    client.stop()
+    client.stop().await
 }
