@@ -6,7 +6,7 @@ pub mod systemd;
 pub mod twin;
 use azure_iot_sdk::client::*;
 use client::{Client, Message};
-use log::{debug, error};
+use log::{info, debug, error};
 use std::sync::{mpsc, Arc, Mutex};
 
 #[tokio::main]
@@ -30,11 +30,17 @@ pub async fn run() -> Result<(), IotError> {
                 }
             }
             Message::Unauthenticated(reason) => {
-                client.stop().await.unwrap();
-                return Err(IotError::from(format!(
-                    "No connection. Reason: {:?}",
-                    reason
-                )));
+                if let UnauthenticatedReason::ExpiredSasToken = reason  {
+                    info!("SAS Token expired, SDK will try to refresh the token automatically");
+                }
+                else {
+                    client.stop().await.unwrap();
+                    return Err(IotError::from(format!(
+                        "No connection. Reason: {:?}",
+                        reason
+                    )));
+                }
+
             }
             Message::Desired(state, desired) => {
                 twin::update(state, desired, Arc::clone(&tx_app2client));
