@@ -1,6 +1,6 @@
 [package]
 name = "iot-client-template-rs"
-version = "0.4.2"
+version = "0.4.3"
 edition = "2021"
 authors = ["Joerg Zeidler <joerg.zeidler@conplement.de>", "Jan Zachmann <jan.zachmann@conplement.de>"]
 repository = "git@github.com:ICS-DeviceManagement/iot-client-template-rs.git"

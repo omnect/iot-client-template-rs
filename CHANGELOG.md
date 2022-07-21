@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.3] Q3 2022
+ - fixed panic when calling IotHubClient::from_identity_service
+ - fixed terminating on ExpiredSasToken
+
 ## [0.4.2] Q3 2022
  - bump to azure-iot-sdk 0.8.2
 

@@ -1,8 +1,8 @@
 use azure_iot_sdk::client::*;
 use log::debug;
 use std::sync::{mpsc::Receiver, mpsc::Sender, Arc, Mutex};
-use tokio::task::JoinHandle;
 use std::time;
+use tokio::task::JoinHandle;
 
 #[cfg(feature = "systemd")]
 use crate::systemd::WatchdogHandler;
@@ -81,7 +81,7 @@ impl Client {
 
         let running = Arc::clone(&self.run);
 
-        self.thread = Some(tokio::spawn(async move {
+        self.thread = Some(tokio::task::spawn_blocking(move || {
             let hundred_millis = time::Duration::from_millis(100);
             let event_handler = ClientEventHandler { direct_methods, tx };
 
@@ -92,10 +92,9 @@ impl Client {
             wdt.init()?;
 
             let mut client = match IotHubClient::get_client_type() {
-                _ if connection_string.is_some() => IotHubClient::from_connection_string(
-                    connection_string.unwrap(),
-                    event_handler,
-                )?,
+                _ if connection_string.is_some() => {
+                    IotHubClient::from_connection_string(connection_string.unwrap(), event_handler)?
+                }
                 ClientType::Device | ClientType::Module => {
                     IotHubClient::from_identity_service(event_handler)?
                 }
