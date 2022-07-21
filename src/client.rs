@@ -81,7 +81,7 @@ impl Client {
 
         let running = Arc::clone(&self.run);
 
-        self.thread = Some(tokio::spawn(async move {
+        self.thread = Some(tokio::task::spawn_blocking(move|| {
             let hundred_millis = time::Duration::from_millis(100);
             let event_handler = ClientEventHandler { direct_methods, tx };
 
@@ -125,7 +125,6 @@ impl Client {
 
     pub async fn stop(self) -> Result<(), IotError> {
         *self.run.lock().unwrap() = false;
-        
         self.thread.unwrap().await?
     }
 }
