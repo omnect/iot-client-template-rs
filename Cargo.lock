@@ -182,8 +182,8 @@ dependencies = [
 
 [[package]]
 name = "azure-iot-sdk"
-version = "0.8.2"
-source = "git+ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk.git?tag=0.8.2#439595f47688cb5f3d78a7862742cbc551588cec"
+version = "0.8.3"
+source = "git+ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk.git?tag=0.8.3#fb30e8fd71f02b596858f24e49de5763a534dbc7"
 dependencies = [
  "azure-iot-sdk-sys",
  "eis-utils",
@@ -194,8 +194,8 @@ dependencies = [
 
 [[package]]
 name = "azure-iot-sdk-sys"
-version = "0.5.0"
-source = "git+ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk-sys.git?tag=0.5.0#0acdf6a7ac32a21b57bbb44b640f91a427a30ae4"
+version = "0.5.1"
+source = "git+ssh://git@github.com/ICS-DeviceManagement/azure-iot-sdk-sys.git?tag=0.5.1#0024059836411a8f6b8f54f3061d31f2a2fef1db"
 dependencies = [
  "bindgen",
  "pkg-config",
@@ -560,7 +560,7 @@ checksum = "9be70c98951c83b8d2f8f60d7065fa6d5146873094452a1008da8c2f1e4205ad"
 dependencies = [
  "cfg-if",
  "libc",
- "wasi 0.10.2+wasi-snapshot-preview1",
+ "wasi 0.10.0+wasi-snapshot-preview1",
 ]
 
 [[package]]
@@ -800,7 +800,7 @@ dependencies = [
 
 [[package]]
 name = "iot-client-template-rs"
-version = "0.4.2"
+version = "0.4.3"
 dependencies = [
  "azure-iot-sdk",
  "env_logger 0.8.4",
@@ -1515,9 +1515,9 @@ dependencies = [
 
 [[package]]
 name = "wasi"
-version = "0.10.2+wasi-snapshot-preview1"
+version = "0.10.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd6fbd9a79829dd1ad0cc20627bf1ed606756a7f77edff7b66b7064f9cb327c6"
+checksum = "1a143597ca7c7793eff794def352d41792a93c481eb1042423ff7ff72ba2c31f"
 
 [[package]]
 name = "wasi"
