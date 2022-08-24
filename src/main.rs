@@ -1,5 +1,5 @@
 use env_logger::{Builder, Env};
-use log::error;
+use log::{info, error};
 use std::process;
 
 fn main() {
@@ -9,6 +9,7 @@ fn main() {
         Builder::from_env(Env::default().default_filter_or("info")).init();
     }
 
+    info!("module version: {}", env!("CARGO_PKG_VERSION"));
     if let Err(e) = iot_client_template_rs::run() {
         error!("Application error: {}", e);
 
