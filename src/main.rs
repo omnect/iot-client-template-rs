@@ -1,5 +1,6 @@
+use azure_iot_sdk::client::*;
 use env_logger::{Builder, Env};
-use log::{info, error};
+use log::{error, info};
 use std::process;
 
 fn main() {
@@ -10,6 +11,8 @@ fn main() {
     }
 
     info!("module version: {}", env!("CARGO_PKG_VERSION"));
+    info!("azure sdk version: {}", IotHubClient::get_sdk_version_string());
+
     if let Err(e) = iot_client_template_rs::run() {
         error!("Application error: {}", e);
 
