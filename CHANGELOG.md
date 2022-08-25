@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.4.6] Q3 2022
  - report azure-sdk-version in twin
  - log info message for azure-sdk-version
+ - bump to azure-iot-sdk 0.8.4
 
 ## [0.4.5] Q3 2022
  - start service after time-sync target to avoid time jumps during service start
