@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.7] Q3 2022
+ - fix report azure-sdk-version in twin
+
 ## [0.4.6] Q3 2022
  - report azure-sdk-version in twin
  - log info message for azure-sdk-version
@@ -36,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - bump to azure-iot-sdk 0.8.1
 
 ## [0.3.1] Q2 2022
- - fixed readme 
+ - fixed readme
 
 ## [0.3.0] Q2 2022
  - bump to azure-iot-sdk 0.8.0:
@@ -57,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    - notify watchdog
 
 ## [0.2.1] Q1 2022
- - add D2C messages 
+ - add D2C messages
 
 ## [0.2.0] Q1 2022
  - renamed package and repo to iot-module-template-rs
