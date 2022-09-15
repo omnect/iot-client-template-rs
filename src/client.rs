@@ -80,7 +80,8 @@ impl Client {
         }
     }
 
-    pub fn run(
+    #[tokio::main]
+    pub async fn run(
         &mut self,
         connection_string: Option<&'static str>,
         direct_methods: Option<DirectMethodMap>,
