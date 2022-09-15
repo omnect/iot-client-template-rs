@@ -1,9 +1,9 @@
 use azure_iot_sdk::client::*;
+use futures_executor::block_on;
 use log::{info, warn};
 use std::sync::{mpsc::Receiver, mpsc::Sender, Arc, Mutex};
 use std::time;
 use tokio::task::JoinHandle;
-use futures_executor::block_on;
 
 #[cfg(feature = "systemd")]
 use crate::systemd::WatchdogHandler;
@@ -30,11 +30,16 @@ impl EventHandler for ClientEventHandler {
 
         let res = match auth_status {
             AuthenticationStatus::Authenticated => self.tx.send(Message::Authenticated),
-            AuthenticationStatus::Unauthenticated(reason) => self.tx.send(Message::Unauthenticated(reason))
+            AuthenticationStatus::Unauthenticated(reason) => {
+                self.tx.send(Message::Unauthenticated(reason))
+            }
         };
 
         if let Err(e) = res {
-            warn!("Couldn't send AuthenticationStatus since the receiver was closed: {}", e.to_string())
+            warn!(
+                "Couldn't send AuthenticationStatus since the receiver was closed: {}",
+                e.to_string()
+            )
         }
     }
 
