@@ -3,6 +3,7 @@ use log::{info, warn};
 use std::sync::{mpsc::Receiver, mpsc::Sender, Arc, Mutex};
 use std::time;
 use tokio::task::JoinHandle;
+use futures_executor::block_on;
 
 #[cfg(feature = "systemd")]
 use crate::systemd::WatchdogHandler;
@@ -126,9 +127,16 @@ impl Client {
         }));
     }
 
-    pub async fn stop(self) -> Result<(), IotError> {
-        *self.run.lock().unwrap() = false;
+    pub fn stop(&mut self) -> Result<(), IotError> {
+        block_on(async {
+            *self.run.lock().unwrap() = false;
+            self.thread.as_mut().unwrap().await?
+        })
+    }
+}
 
-        self.thread.unwrap().await?
+impl Drop for Client {
+    fn drop(&mut self) {
+        self.stop().unwrap();
     }
 }

@@ -838,6 +838,7 @@ version = "0.4.9"
 dependencies = [
  "azure-iot-sdk",
  "env_logger 0.8.4",
+ "futures-executor",
  "log",
  "log-panics",
  "sd-notify",
