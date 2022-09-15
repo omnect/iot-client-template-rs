@@ -13,7 +13,8 @@ use std::sync::{mpsc, Arc, Mutex};
 
 static INIT: Once = Once::new();
 
-pub fn run() -> Result<(), IotError> {
+#[tokio::main]
+pub async fn run() -> Result<(), IotError> {
     let mut client = Client::new();
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
