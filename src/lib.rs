@@ -53,5 +53,5 @@ pub async fn run() -> Result<(), IotError> {
         }
     }
 
-    client.stop().await
+    client.stop()
 }
