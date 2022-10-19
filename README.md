@@ -9,7 +9,7 @@ This `iot-client-template-rs` repository provides code to develop Rust based Azu
 
 ## Library dependencies
 
-Please refer to [azure-iot-sdk-sys](https://github.com/ICS-DeviceManagement/azure-iot-sdk-sys/blob/main/README.md) documentation in order to provide mandatory libraries needed to build `iot-client-template-rs` successfully.
+Please refer to [azure-iot-sdk-sys](https://github.com/omnect/azure-iot-sdk-sys/blob/main/README.md) documentation in order to provide mandatory libraries needed to build `iot-client-template-rs` successfully.
 
 An error output similar to the following example indicates that libraries are not set correctly:
 ```
@@ -33,7 +33,7 @@ First of all you might have to configure [client type](#client-type) and [system
 You have to choose which flavour of iot client you want to build. Thus set one of these client types in your default features:
 1. `device_client` ([currently not supported with TPM attestation](https://azure.github.io/iot-identity-service/develop-an-agent.html#connecting-your-agent-to-iot-hub))
 2. `module_client` (default)
-3. `edge_client` 
+3. `edge_client`
 
 ### systemd integration
 
@@ -43,7 +43,7 @@ The `systemd` feature is an optional feature which is enabled by default. If it 
 
 # Template and example code
 
-This project shows a basic skeleton for an initial implementation of a Rust based iot device client. It demonstrates how to make use of our Rust [azure-iot-sdk](https://github.com/ICS-DeviceManagement/azure-iot-sdk) in order to connect to Azure iot-hub. Moreover there are examples to show basic communication patterns:
+This project shows a basic skeleton for an initial implementation of a Rust based iot device client. It demonstrates how to make use of our Rust [azure-iot-sdk](https://github.com/omnect/azure-iot-sdk) in order to connect to Azure iot-hub. Moreover there are examples to show basic communication patterns:
 
 1. **Client**: [client.rs](src/client.rs) implements basic logic needed to communicate with iot-hub. Therefore the `EventHandler` trait is implemented in order to receive new desired properties, direct method calls or cloud to device (C2D) messages from iot-hub. Further the client provides a message channel to send reported properities and device to cloud messages (D2C) to iot-hub.
 2. **Twin properties**: [message.rs](src/message.rs) implements logic that demonstrates how the client twin can be utilized in applications. As an example desired properties are directly sent back as reported properties.
@@ -57,7 +57,7 @@ All examples can be tested via [iot-explorer](https://docs.microsoft.com/en-us/a
 
 # Platform integration
 
-Both of the supported ICS_DeviceManagement targets - [yocto](https://github.com/ICS-DeviceManagement/meta-ics-dm) and [simulator](https://github.com/ICS-DeviceManagement/simulator) - integrate the `iot-client-template-rs` and serve as an example for device integration.
+Both of the supported ICS_DeviceManagement targets - [yocto](https://github.com/omnect/meta-ics-dm) and [simulator](https://github.com/omnect/simulator) - integrate the `iot-client-template-rs` and serve as an example for device integration.
 
 # Client identity creation in Azure iot-hub
 
@@ -67,13 +67,13 @@ In order to enable the communication between client and cloud a device or module
 1. **Client identity creation on device via Azure Identity Service (AIS)**: In case your device integrates [AIS](https://azure.github.io/iot-identity-service/), the module creation will be managed automatically on demand. ICS_DeviceManagement yocto layer and simulator support AIS by default.
 2. **Manual identity creation and connection string**: As an alternative you might create your device or modules manually in iot-hub and pass the corresponding connection string to the `client.run()` call in [lib.rs](src/lib.rs):
 
-```   
+```
    client.run(
       Some("your connection string"),
       Some(methods),
       tx_client2app,
       rx_app2client,
-   );  
+   );
 ```
 # License
 
