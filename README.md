@@ -57,14 +57,14 @@ All examples can be tested via [iot-explorer](https://docs.microsoft.com/en-us/a
 
 # Platform integration
 
-Both of the supported ICS_DeviceManagement targets - [yocto](https://github.com/omnect/meta-ics-dm) and [simulator](https://github.com/omnect/simulator) - integrate the `iot-client-template-rs` and serve as an example for device integration.
+Both of the supported omnect Device Management targets - [yocto](https://github.com/omnect/meta-omnect) and [simulator](https://github.com/omnect/simulator) - integrate the `iot-client-template-rs` and serve as an example for device integration.
 
 # Client identity creation in Azure iot-hub
 
 In order to enable the communication between client and cloud a device or module identity needs to be created in Azure iot-hub.<br>
 ***Note: This only applies to client types device_client and module_client (clients of type edge_client connect via edge runtime).***
 
-1. **Client identity creation on device via Azure Identity Service (AIS)**: In case your device integrates [AIS](https://azure.github.io/iot-identity-service/), the module creation will be managed automatically on demand. ICS_DeviceManagement yocto layer and simulator support AIS by default.
+1. **Client identity creation on device via Azure Identity Service (AIS)**: In case your device integrates [AIS](https://azure.github.io/iot-identity-service/), the module creation will be managed automatically on demand. Omnect Device Management yocto layer and simulator support AIS by default.
 2. **Manual identity creation and connection string**: As an alternative you might create your device or modules manually in iot-hub and pass the corresponding connection string to the `client.run()` call in [lib.rs](src/lib.rs):
 
 ```
