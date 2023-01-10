@@ -1,6 +1,6 @@
 [package]
 name = "iot-client-template-rs"
-version = "0.4.10"
+version = "0.4.12"
 edition = "2021"
 authors = ["Joerg Zeidler <joerg.zeidler@conplement.de>", "Jan Zachmann <jan.zachmann@conplement.de>"]
 repository = "git@github.com:omnect/iot-client-template-rs.git"
@@ -15,7 +15,7 @@ sd-notify = { version = "0.4.1", optional = true }
 serde_json = "1.0"
 env_logger = "0.8"
 log = "0.4"
-tokio = { version = "1.19.2", features = ["full"] }
+tokio = { version = "1.23", features = ["full"] }
 log-panics = { version = "2", features = ["with-backtrace"]}
 futures-executor = "0.3"
 
