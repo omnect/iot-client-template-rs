@@ -4,6 +4,7 @@ pub mod message;
 #[cfg(feature = "systemd")]
 pub mod systemd;
 pub mod twin;
+use anyhow::Result;
 use azure_iot_sdk::client::*;
 use client::{Client, Message};
 use log::{debug, error};
@@ -14,7 +15,7 @@ use std::sync::{mpsc, Arc, Mutex};
 static INIT: Once = Once::new();
 
 #[tokio::main]
-pub async fn run() -> Result<(), IotError> {
+pub async fn run() -> Result<()> {
     let mut client = Client::new();
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
@@ -37,10 +38,7 @@ pub async fn run() -> Result<(), IotError> {
             }
             Message::Unauthenticated(reason) => {
                 if !matches!(reason, UnauthenticatedReason::ExpiredSasToken) {
-                    return Err(IotError::from(format!(
-                        "No connection. Reason: {:?}",
-                        reason
-                    )));
+                    anyhow::bail!("No connection. Reason: {:?}", reason);
                 }
             }
             Message::Desired(state, desired) => {

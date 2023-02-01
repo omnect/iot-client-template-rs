@@ -1,4 +1,5 @@
 use crate::Message;
+use anyhow::Result;
 use azure_iot_sdk::client::*;
 use serde_json::json;
 use std::sync::mpsc::Sender;
@@ -23,7 +24,7 @@ pub fn update(
     }
 }
 
-pub fn report_versions(tx_app2client: Arc<Mutex<Sender<Message>>>) -> Result<(), IotError> {
+pub fn report_versions(tx_app2client: Arc<Mutex<Sender<Message>>>) -> Result<()> {
     tx_app2client
         .lock()
         .unwrap()
