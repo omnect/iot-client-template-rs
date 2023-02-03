@@ -11,6 +11,7 @@ use log::{debug, error};
 use std::matches;
 use std::sync::Once;
 use std::sync::{mpsc, Arc, Mutex};
+use twin::{ReportProperty, Twin};
 
 static INIT: Once = Once::new();
 
@@ -21,6 +22,7 @@ pub async fn run() -> Result<()> {
     let (tx_app2client, rx_app2client) = mpsc::channel();
     let tx_app2client = Arc::new(Mutex::new(tx_app2client));
     let methods = direct_methods::get_direct_methods(Arc::clone(&tx_app2client));
+    let mut twin = Twin::new(Arc::clone(&tx_app2client));
 
     client.run(None, methods, tx_client2app, rx_app2client);
 
@@ -31,18 +33,21 @@ pub async fn run() -> Result<()> {
                     #[cfg(feature = "systemd")]
                     systemd::notify_ready();
 
-                    if let Err(e) = twin::report_versions(Arc::clone(&tx_app2client)) {
-                        error!("Couldn't report version: {}", e);
-                    }
+                    vec![ReportProperty::Versions, ReportProperty::NetworkStatus]
+                        .iter()
+                        .for_each(|p| twin.report(p).unwrap_or_else(|e| error!("{:#?}", e)));
                 });
             }
             Message::Unauthenticated(reason) => {
-                if !matches!(reason, UnauthenticatedReason::ExpiredSasToken) {
-                    anyhow::bail!("No connection. Reason: {:?}", reason);
-                }
+                anyhow::ensure!(
+                    !matches!(reason, UnauthenticatedReason::ExpiredSasToken),
+                    "No connection. Reason: {:?}",
+                    reason
+                );
             }
             Message::Desired(state, desired) => {
-                twin::update(state, desired, Arc::clone(&tx_app2client));
+                twin.update(state, desired)
+                    .unwrap_or_else(|e| error!("{:#?}", e));
             }
             Message::C2D(msg) => {
                 message::update(msg, Arc::clone(&tx_app2client));

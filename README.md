@@ -46,7 +46,7 @@ The `systemd` feature is an optional feature which is enabled by default. If it 
 This project shows a basic skeleton for an initial implementation of a Rust based iot device client. It demonstrates how to make use of our Rust [azure-iot-sdk](https://github.com/omnect/azure-iot-sdk) in order to connect to Azure iot-hub. Moreover there are examples to show basic communication patterns:
 
 1. **Client**: [client.rs](src/client.rs) implements basic logic needed to communicate with iot-hub. Therefore the `EventHandler` trait is implemented in order to receive new desired properties, direct method calls or cloud to device (C2D) messages from iot-hub. Further the client provides a message channel to send reported properities and device to cloud messages (D2C) to iot-hub.
-2. **Twin properties**: [message.rs](src/message.rs) implements logic that demonstrates how the client twin can be utilized in applications. As an example desired properties are directly sent back as reported properties.
+2. **Twin properties**: [message.rs](src/message.rs) implements logic that demonstrates how the client twin can be utilized in applications. As an example desired properties are directly sent back as reported properties. Futhermore the module and azure-sdk version is reported as well as the current network adapter status.
 3. **Direct methods**: [direct_methods.rs](src/direct_methods.rs) implements two functions that serve as direct method and can be synchronously called by iot-hub:
    1. `closure_send_d2c_message`: A closure that doesn't take a parameter and doesn't return a result. The method triggers an outgoing D2C message (@see **3. D2C message**).
    2. `func_echo_params_as_result`: A function that takes a parameter and returns the same parameter as result.
