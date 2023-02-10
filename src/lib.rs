@@ -28,21 +28,15 @@ pub async fn run() -> Result<()> {
 
     for msg in rx_client2app {
         match msg {
-            Message::Authenticated => {
-                INIT.call_once(|| {
-                    #[cfg(feature = "systemd")]
-                    systemd::notify_ready();
+            Message::Authenticated => INIT.call_once(|| {
+                #[cfg(feature = "systemd")]
+                systemd::notify_ready();
 
-                    vec![ReportProperty::Versions, ReportProperty::NetworkStatus]
-                        .iter()
-                        .for_each(|p| {
-                            TWIN.lock()
-                                .unwrap()
-                                .report(p)
-                                .unwrap_or_else(|e| error!("{:#?}", e))
-                        });
-                });
-            }
+                TWIN.lock()
+                    .unwrap()
+                    .report(&ReportProperty::Versions)
+                    .unwrap_or_else(|e| error!("{:#?}", e));
+            }),
             Message::Unauthenticated(reason) => {
                 anyhow::ensure!(
                     !matches!(reason, UnauthenticatedReason::ExpiredSasToken),
