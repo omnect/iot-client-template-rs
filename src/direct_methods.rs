@@ -1,11 +1,9 @@
-use crate::twin;
 use crate::Message;
 use anyhow::Result;
 use azure_iot_sdk::client::*;
 use serde_json::json;
 use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
-use twin::{ReportProperty, TWIN};
 
 pub fn get_direct_methods(tx_app2client: Arc<Mutex<Sender<Message>>>) -> Option<DirectMethodMap> {
     let mut methods = DirectMethodMap::new();
@@ -47,12 +45,4 @@ fn mirror_func_params_as_result(in_json: serde_json::Value) -> Result<Option<ser
     });
 
     Ok(Some(out_json))
-}
-
-pub fn refresh_network_status(_in_json: serde_json::Value) -> Result<Option<serde_json::Value>> {
-    TWIN.lock()
-        .unwrap()
-        .report(&ReportProperty::NetworkStatus)?;
-
-    Ok(None)
 }
