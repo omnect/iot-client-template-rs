@@ -208,6 +208,7 @@ dependencies = [
 [[package]]
 name = "azure-iot-sdk"
 version = "0.9.0"
+source = "git+ssh://git@github.com/omnect/azure-iot-sdk.git?tag=0.9.0#ce7b53f098ef4a6987b5e6b800691c32036949ca"
 dependencies = [
  "anyhow",
  "azure-iot-sdk-sys",
@@ -219,8 +220,8 @@ dependencies = [
 
 [[package]]
 name = "azure-iot-sdk-sys"
-version = "0.5.5"
-source = "git+ssh://git@github.com/omnect/azure-iot-sdk-sys.git?tag=0.5.5#d8311a517f3e8217ac3670783ba3d9eece3501bc"
+version = "0.5.7"
+source = "git+ssh://git@github.com/omnect/azure-iot-sdk-sys.git?tag=0.5.7#12af06fbd6d6ae053ebbc7b5310832eb4de4bb65"
 dependencies = [
  "bindgen",
  "pkg-config",
@@ -249,15 +250,13 @@ checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 
 [[package]]
 name = "bindgen"
-version = "0.60.1"
+version = "0.63.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "062dddbc1ba4aca46de6338e2bf87771414c335f7b2f2036e8f3e9befebf88e6"
+checksum = "36d860121800b2a9a94f9b5604b332d5cffb234ce17609ea479d723dbc9d3885"
 dependencies = [
  "bitflags",
  "cexpr",
  "clang-sys",
- "clap",
- "env_logger 0.9.3",
  "lazy_static",
  "lazycell",
  "log",
@@ -267,6 +266,7 @@ dependencies = [
  "regex",
  "rustc-hash",
  "shlex",
+ "syn 1.0.107",
  "which",
 ]
 
@@ -359,30 +359,6 @@ dependencies = [
  "glob",
  "libc",
  "libloading",
-]
-
-[[package]]
-name = "clap"
-version = "3.2.23"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71655c45cb9845d3270c9d6df84ebe72b4dad3c2ba3f7023ad47c144e4e473a5"
-dependencies = [
- "atty",
- "bitflags",
- "clap_lex",
- "indexmap",
- "strsim",
- "termcolor",
- "textwrap",
-]
-
-[[package]]
-name = "clap_lex"
-version = "0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2850f2f5a82cbf437dd5af4d49848fbdfc27c157c3d010345776f952765261c5"
-dependencies = [
- "os_str_bytes",
 ]
 
 [[package]]
@@ -538,7 +514,7 @@ dependencies = [
  "aziot-key-common-http",
  "aziot-keyd-config",
  "base64",
- "env_logger 0.8.4",
+ "env_logger",
  "http-common",
  "hyper",
  "hyper-timeout",
@@ -559,19 +535,6 @@ name = "env_logger"
 version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a19187fea3ac7e84da7dacf48de0c45d63c6a76f9490dae389aead16c243fce3"
-dependencies = [
- "atty",
- "humantime",
- "log",
- "regex",
- "termcolor",
-]
-
-[[package]]
-name = "env_logger"
-version = "0.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a12e6657c4c97ebab115a42dcee77225f7f482cdd841cf7088c657a42e9e00e7"
 dependencies = [
  "atty",
  "humantime",
@@ -1001,14 +964,16 @@ dependencies = [
  "anyhow",
  "azure-iot-sdk",
  "default-env",
- "env_logger 0.8.4",
+ "env_logger",
  "futures-executor",
  "log",
  "log-panics",
  "network-interface",
+ "once_cell",
  "sd-notify",
  "serde",
  "serde_json",
+ "serde_with",
  "tokio",
 ]
 
@@ -1272,12 +1237,6 @@ dependencies = [
  "pkg-config",
  "vcpkg",
 ]
-
-[[package]]
-name = "os_str_bytes"
-version = "6.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b7820b9daea5457c9f21c69448905d723fbd21136ccf521748f23fd49e723ee"
 
 [[package]]
 name = "parking_lot"
@@ -1612,12 +1571,6 @@ checksum = "be55cf8942feac5c765c2c993422806843c9a9a45d4d5c407ad6dd2ea95eb9b6"
 dependencies = [
  "winapi-util",
 ]
-
-[[package]]
-name = "textwrap"
-version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "222a222a5bfe1bba4a77b45ec488a741b3cb8872e5e499451fd7d0129c9c7c3d"
 
 [[package]]
 name = "thiserror"
