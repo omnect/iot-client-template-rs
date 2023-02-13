@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.4.13] Q1 2023
  - bumped to azure-iot-sdk 0.9.0
  - switched to anyhow based errors
+ - twin:
+   - refactored from functions to struct
+   - wrapped as singleton
 
 ## [0.4.12] Q1 2023
  - updated tokio to 1.23 in order to fix cargo audit warning
