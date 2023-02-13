@@ -16,7 +16,7 @@ fn main() {
     info!("azure sdk version: {}", IotHubClient::get_sdk_version_string());
 
     if let Err(e) = iot_client_template_rs::run() {
-        error!("Application error: {}", e);
+        error!("Application error: {:#?}", e);
 
         process::exit(1);
     }
