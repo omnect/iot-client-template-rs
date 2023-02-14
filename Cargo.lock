@@ -948,7 +948,7 @@ dependencies = [
 
 [[package]]
 name = "iot-client-template-rs"
-version = "0.4.13"
+version = "0.4.14"
 dependencies = [
  "anyhow",
  "azure-iot-sdk",
