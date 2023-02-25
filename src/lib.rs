@@ -11,7 +11,7 @@ use log::{debug, error};
 use std::matches;
 use std::sync::Once;
 use std::sync::{mpsc, Arc, Mutex};
-use twin::{ReportProperty, TWIN};
+use twin::ReportProperty;
 
 static INIT: Once = Once::new();
 
@@ -22,8 +22,8 @@ pub async fn run() -> Result<()> {
     let (tx_app2client, rx_app2client) = mpsc::channel();
     let tx_app2client = Arc::new(Mutex::new(tx_app2client));
     let methods = direct_methods::get_direct_methods(Arc::clone(&tx_app2client));
+    let twin = twin::get_or_init(Some(Arc::clone(&tx_app2client)));
 
-    TWIN.lock().unwrap().set_sender(Arc::clone(&tx_app2client));
     client.run(None, methods, tx_client2app, rx_app2client);
 
     for msg in rx_client2app {
@@ -32,10 +32,8 @@ pub async fn run() -> Result<()> {
                 #[cfg(feature = "systemd")]
                 systemd::notify_ready();
 
-                TWIN.lock()
-                    .unwrap()
-                    .report(&ReportProperty::Versions)
-                    .unwrap_or_else(|e| error!("{:#?}", e));
+                twin.report(&ReportProperty::Versions)
+                    .unwrap_or_else(|e| error!("report: {:#?}", e));
             }),
             Message::Unauthenticated(reason) => {
                 anyhow::ensure!(
@@ -45,10 +43,8 @@ pub async fn run() -> Result<()> {
                 );
             }
             Message::Desired(state, desired) => {
-                TWIN.lock()
-                    .unwrap()
-                    .update(state, desired)
-                    .unwrap_or_else(|e| error!("{:#?}", e));
+                twin.update(state, desired)
+                    .unwrap_or_else(|e| error!("update: {:#?}", e));
             }
             Message::C2D(msg) => {
                 message::update(msg, Arc::clone(&tx_app2client));
