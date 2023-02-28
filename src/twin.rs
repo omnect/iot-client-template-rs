@@ -16,12 +16,7 @@ pub struct TwinInstance {
 pub fn get_or_init(tx: Option<Arc<Mutex<Sender<Message>>>>) -> TwinInstance {
     if tx.is_some() {
         TwinInstance {
-            inner: INSTANCE.get_or_init(|| {
-                Mutex::new(Twin {
-                    tx: tx,
-                    ..Default::default()
-                })
-            }),
+            inner: INSTANCE.get_or_init(|| Mutex::new(Twin { tx })),
         }
     } else {
         TwinInstance {
@@ -81,7 +76,6 @@ impl Twin {
             "azure-sdk-version": IotHubClient::get_sdk_version_string()
         }))
         .context("report_versions")
-        .map_err(|err| err.into())
     }
 
     fn update_desired(&mut self, desired: &serde_json::Value) -> Result<()> {
@@ -92,7 +86,6 @@ impl Twin {
 
         self.report_impl(serde_json::Value::Object(map))
             .context("update_desired")
-            .map_err(|err| err.into())
     }
 
     fn report_impl(&mut self, value: serde_json::Value) -> Result<()> {
@@ -100,7 +93,7 @@ impl Twin {
 
         self.tx
             .as_ref()
-            .ok_or(anyhow::anyhow!("tx channel missing"))?
+            .ok_or_else(|| anyhow::anyhow!("tx channel missing"))?
             .lock()
             .unwrap()
             .send(Message::Reported(value))
