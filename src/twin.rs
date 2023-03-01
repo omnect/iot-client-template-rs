@@ -1,20 +1,52 @@
 use crate::Message;
-use anyhow::Context;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use azure_iot_sdk::client::*;
-use once_cell::sync::Lazy;
+use log::info;
+use once_cell::sync::OnceCell;
 use serde_json::json;
 use std::sync::mpsc::Sender;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, MutexGuard};
 
-pub static TWIN: Lazy<Mutex<Twin>> = Lazy::new(|| {
-    Mutex::new(Twin {
-        ..Default::default()
-    })
-});
+static INSTANCE: OnceCell<Mutex<Twin>> = OnceCell::new();
+
+pub struct TwinInstance {
+    inner: &'static Mutex<Twin>,
+}
+
+pub fn get_or_init(tx: Option<Arc<Mutex<Sender<Message>>>>) -> TwinInstance {
+    if tx.is_some() {
+        TwinInstance {
+            inner: INSTANCE.get_or_init(|| Mutex::new(Twin { tx })),
+        }
+    } else {
+        TwinInstance {
+            inner: INSTANCE.get().unwrap(),
+        }
+    }
+}
+
+struct TwinLock<'a> {
+    inner: MutexGuard<'a, Twin>,
+}
+
+impl TwinInstance {
+    fn lock(&self) -> TwinLock<'_> {
+        TwinLock {
+            inner: self.inner.lock().unwrap_or_else(|e| e.into_inner()),
+        }
+    }
+
+    pub fn report(&self, property: &ReportProperty) -> Result<()> {
+        self.lock().inner.report(property)
+    }
+
+    pub fn update(&self, state: TwinUpdateState, desired: serde_json::Value) -> Result<()> {
+        self.lock().inner.update(state, desired)
+    }
+}
 
 #[derive(Default)]
-pub struct Twin {
+struct Twin {
     tx: Option<Arc<Mutex<Sender<Message>>>>,
 }
 
@@ -24,40 +56,26 @@ pub enum ReportProperty {
 }
 
 impl Twin {
-    pub fn set_sender(&mut self, tx: Arc<Mutex<Sender<Message>>>) {
-        self.tx = Some(tx);
-    }
-
-    pub fn update(&mut self, state: TwinUpdateState, desired: serde_json::Value) -> Result<()> {
+    fn update(&mut self, state: TwinUpdateState, desired: serde_json::Value) -> Result<()> {
         match state {
-            TwinUpdateState::Partial => {
-                self.update_desired(&desired)
-            }
-            TwinUpdateState::Complete => {
-                self.update_desired(&desired["desired"])
-            }
+            TwinUpdateState::Partial => self.update_desired(&desired),
+            TwinUpdateState::Complete => self.update_desired(&desired["desired"]),
         }
     }
 
-    pub fn report(&mut self, property: &ReportProperty) -> Result<()> {
+    fn report(&mut self, property: &ReportProperty) -> Result<()> {
         match property {
             ReportProperty::Versions => self.report_versions().context("Couldn't report version"),
-            ReportProperty::MyOtherReportProperty => todo!(),
+            ReportProperty::MyOtherReportProperty => unimplemented!(),
         }
     }
 
     fn report_versions(&mut self) -> Result<()> {
-        self.tx
-            .as_ref()
-            .ok_or(anyhow::anyhow!("sender missing").context("report_versions"))?
-            .lock()
-            .unwrap()
-            .send(Message::Reported(json!({
-                "module-version": env!("CARGO_PKG_VERSION"),
-                "azure-sdk-version": IotHubClient::get_sdk_version_string()
-            })))?;
-
-        Ok(())
+        self.report_impl(json!({
+            "module-version": env!("CARGO_PKG_VERSION"),
+            "azure-sdk-version": IotHubClient::get_sdk_version_string()
+        }))
+        .context("report_versions")
     }
 
     fn update_desired(&mut self, desired: &serde_json::Value) -> Result<()> {
@@ -66,13 +84,19 @@ impl Twin {
 
         map.remove("$version");
 
+        self.report_impl(serde_json::Value::Object(map))
+            .context("update_desired")
+    }
+
+    fn report_impl(&mut self, value: serde_json::Value) -> Result<()> {
+        info!("report: \n{:?}", value);
+
         self.tx
             .as_ref()
-            .ok_or(anyhow::anyhow!("sender missing").context("report_versions"))?
+            .ok_or_else(|| anyhow::anyhow!("tx channel missing"))?
             .lock()
             .unwrap()
-            .send(Message::Reported(serde_json::Value::Object(map)))?;
-
-            Ok(())
+            .send(Message::Reported(value))
+            .map_err(|err| err.into())
     }
 }

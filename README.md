@@ -1,4 +1,5 @@
-# What is iot-client-template-rs?
+# iot-client-template-rs
+Product page: https://www.omnect.io/home
 
 This `iot-client-template-rs` repository provides code to develop Rust based Azure IoT device applications. There are 3 basic approaches to implement Azure compliant device applications:
 1. [device twin](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-device-twins): native application representing the device and thus only exists once on a device.
@@ -89,4 +90,8 @@ submitted for inclusion in the work by you, as defined in the Apache-2.0
 license, shall be dual licensed as above, without any additional terms or
 conditions.
 
-Copyright (c) 2021 conplement AG
+---
+
+copyright (c) 2021 conplement AG<br>
+Content published under the Apache License Version 2.0 or MIT license, are marked as such. They may be used in accordance with the stated license conditions.
+
