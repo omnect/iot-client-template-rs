@@ -5,7 +5,7 @@ use log::info;
 use once_cell::sync::OnceCell;
 use serde_json::json;
 use std::sync::mpsc::Sender;
-use std::sync::{Arc, Mutex, MutexGuard};
+use std::sync::{Mutex, MutexGuard};
 
 static INSTANCE: OnceCell<Mutex<Twin>> = OnceCell::new();
 
@@ -13,10 +13,10 @@ pub struct TwinInstance {
     inner: &'static Mutex<Twin>,
 }
 
-pub fn get_or_init(tx: Option<Arc<Mutex<Sender<Message>>>>) -> TwinInstance {
-    if tx.is_some() {
+pub fn get_or_init(tx: Option<& Sender<Message>>) -> TwinInstance {
+    if let Some(tx) = tx {
         TwinInstance {
-            inner: INSTANCE.get_or_init(|| Mutex::new(Twin { tx })),
+            inner: INSTANCE.get_or_init(|| Mutex::new(Twin { tx: Some(tx.clone()) })),
         }
     } else {
         TwinInstance {
@@ -47,7 +47,7 @@ impl TwinInstance {
 
 #[derive(Default)]
 struct Twin {
-    tx: Option<Arc<Mutex<Sender<Message>>>>,
+    tx: Option<Sender<Message>>,
 }
 
 pub enum ReportProperty {
@@ -94,8 +94,6 @@ impl Twin {
         self.tx
             .as_ref()
             .ok_or_else(|| anyhow::anyhow!("tx channel missing"))?
-            .lock()
-            .unwrap()
             .send(Message::Reported(value))
             .map_err(|err| err.into())
     }

@@ -3,10 +3,11 @@ use anyhow::Result;
 use azure_iot_sdk::client::*;
 use serde_json::json;
 use std::sync::mpsc::Sender;
-use std::sync::{Arc, Mutex};
 
-pub fn get_direct_methods(tx_app2client: Arc<Mutex<Sender<Message>>>) -> Option<DirectMethodMap> {
+pub fn get_direct_methods(tx_app2client: &Sender<Message>) -> Option<DirectMethodMap> {
     let mut methods = DirectMethodMap::new();
+
+    let tx_app2client = tx_app2client.clone();
 
     methods.insert(
         String::from("closure_send_d2c_message"),
@@ -23,8 +24,6 @@ pub fn get_direct_methods(tx_app2client: Arc<Mutex<Sender<Message>>>) -> Option<
                 .unwrap();
 
             tx_app2client
-                .lock()
-                .unwrap()
                 .send(Message::D2C(msg))
                 .unwrap();
             Ok(None)

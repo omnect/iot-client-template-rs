@@ -10,7 +10,7 @@ use client::{Client, Message};
 use log::{debug, error};
 use std::matches;
 use std::sync::Once;
-use std::sync::{mpsc, Arc, Mutex};
+use std::sync::mpsc;
 use twin::ReportProperty;
 
 static INIT: Once = Once::new();
@@ -20,9 +20,9 @@ pub async fn run() -> Result<()> {
     let mut client = Client::new();
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
-    let tx_app2client = Arc::new(Mutex::new(tx_app2client));
-    let methods = direct_methods::get_direct_methods(Arc::clone(&tx_app2client));
-    let twin = twin::get_or_init(Some(Arc::clone(&tx_app2client)));
+
+    let methods = direct_methods::get_direct_methods(&tx_app2client);
+    let twin = twin::get_or_init(Some(&tx_app2client));
 
     client.run(None, methods, tx_client2app, rx_app2client);
 
@@ -47,7 +47,7 @@ pub async fn run() -> Result<()> {
                     .unwrap_or_else(|e| error!("update: {:#?}", e));
             }
             Message::C2D(msg) => {
-                message::update(msg, Arc::clone(&tx_app2client));
+                message::update(msg, &tx_app2client);
             }
             _ => debug!("Application received unhandled message"),
         }
