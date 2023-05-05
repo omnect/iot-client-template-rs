@@ -1,6 +1,6 @@
 [package]
 name = "iot-client-template-rs"
-version = "0.4.18"
+version = "0.4.19"
 edition = "2021"
 authors = ["omnect@conplement.de>"]
 repository = "git@github.com:omnect/iot-client-template-rs.git"
