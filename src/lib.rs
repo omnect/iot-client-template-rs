@@ -9,8 +9,8 @@ use azure_iot_sdk::client::*;
 use client::{Client, Message};
 use log::{debug, error};
 use std::matches;
-use std::sync::Once;
 use std::sync::mpsc;
+use std::sync::Once;
 use twin::ReportProperty;
 
 static INIT: Once = Once::new();
@@ -21,7 +21,7 @@ pub async fn run() -> Result<()> {
     let (tx_client2app, rx_client2app) = mpsc::channel();
     let (tx_app2client, rx_app2client) = mpsc::channel();
 
-    let methods = direct_methods::get_direct_methods(&tx_app2client);
+    let methods = direct_methods::direct_methods(&tx_app2client);
     let twin = twin::get_or_init(Some(&tx_app2client));
 
     client.run(None, methods, tx_client2app, rx_app2client);
