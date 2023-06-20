@@ -1,6 +1,6 @@
 [package]
 name = "iot-client-template-rs"
-version = "0.4.19"
+version = "0.4.20"
 edition = "2021"
 authors = ["omnect@conplement.de>"]
 repository = "git@github.com:omnect/iot-client-template-rs.git"
@@ -10,7 +10,7 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 anyhow = "1.0"
-azure-iot-sdk = { git = "ssh://git@github.com/omnect/azure-iot-sdk.git", tag = "0.9.0", default-features = false }
+azure-iot-sdk = { git = "https://github.com/omnect/azure-iot-sdk.git", tag = "0.9.5", default-features = false }
 env_logger = "0.8"
 futures-executor = "0.3"
 log = "0.4"

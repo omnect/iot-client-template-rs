@@ -4,7 +4,7 @@ use azure_iot_sdk::client::*;
 use serde_json::json;
 use std::sync::mpsc::Sender;
 
-pub fn get_direct_methods(tx_app2client: &Sender<Message>) -> Option<DirectMethodMap> {
+pub fn direct_methods(tx_app2client: &Sender<Message>) -> Option<DirectMethodMap> {
     let mut methods = DirectMethodMap::new();
 
     let tx_app2client = tx_app2client.clone();
@@ -23,9 +23,7 @@ pub fn get_direct_methods(tx_app2client: &Sender<Message>) -> Option<DirectMetho
                 .build()
                 .unwrap();
 
-            tx_app2client
-                .send(Message::D2C(msg))
-                .unwrap();
+            tx_app2client.send(Message::D2C(msg)).unwrap();
             Ok(None)
         }),
     );
