@@ -213,21 +213,22 @@ dependencies = [
 
 [[package]]
 name = "azure-iot-sdk"
-version = "0.9.5"
-source = "git+https://github.com/omnect/azure-iot-sdk.git?tag=0.9.5#586b956fa944cd3ff6e953d702ea7a53a63bf68b"
+version = "0.10.0"
+source = "git+https://github.com/JanZachmann/azure-iot-sdk.git?branch=async-api#c29e4766f96a048312d0bcbbabded654ad48d506"
 dependencies = [
  "anyhow",
+ "async-trait",
  "azure-iot-sdk-sys",
  "eis-utils",
  "log",
- "rand",
  "serde_json",
+ "tokio",
 ]
 
 [[package]]
 name = "azure-iot-sdk-sys"
-version = "0.5.8"
-source = "git+https://github.com/omnect/azure-iot-sdk-sys.git?tag=0.5.8#e171e65f2b8d6512b43d7a7f8f38aba2a37be1cf"
+version = "0.6.0"
+source = "git+https://github.com/omnect/azure-iot-sdk-sys.git?tag=0.6.0#cdfdcbeac73f97b204e0ff5dfecd170cfb8ce290"
 dependencies = [
  "bindgen",
  "pkg-config",
@@ -439,8 +440,8 @@ dependencies = [
 
 [[package]]
 name = "eis-utils"
-version = "0.2.6"
-source = "git+https://github.com/omnect/eis-utils.git?tag=0.2.6#350681dd0e8f277346fa2acfd72fd0164e9fce29"
+version = "0.3.0"
+source = "git+https://github.com/omnect/eis-utils.git?tag=0.3.0#8baffddba778dde438441cc05de8bb9d3336bd44"
 dependencies = [
  "aziot-cert-client-async",
  "aziot-cert-common",
@@ -611,17 +612,6 @@ checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
  "typenum",
  "version_check",
-]
-
-[[package]]
-name = "getrandom"
-version = "0.2.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be4136b2a15dd319360be1c07d9933517ccf0be8f16bf62a3bee4f0d618df427"
-dependencies = [
- "cfg-if",
- "libc",
- "wasi 0.11.0+wasi-snapshot-preview1",
 ]
 
 [[package]]
@@ -899,12 +889,13 @@ dependencies = [
 
 [[package]]
 name = "iot-client-template-rs"
-version = "0.4.21"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "azure-iot-sdk",
  "env_logger",
  "futures-executor",
+ "futures-util",
  "log",
  "log-panics",
  "once_cell",
@@ -1192,12 +1183,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "26072860ba924cbfa98ea39c8c19b4dd6a4a25423dbdf219c1eca91aa0cf6964"
 
 [[package]]
-name = "ppv-lite86"
-version = "0.2.17"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.60"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1213,36 +1198,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b9ab9c7eadfd8df19006f1cf1a4aed13540ed5cbc047010ece5826e10825488"
 dependencies = [
  "proc-macro2",
-]
-
-[[package]]
-name = "rand"
-version = "0.8.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34af8d1a0e25924bc5b7c43c079c942339d8f0a8b57c39049bef581b46327404"
-dependencies = [
- "libc",
- "rand_chacha",
- "rand_core",
-]
-
-[[package]]
-name = "rand_chacha"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6c10a63a0fa32252be49d21e7709d4d4baf8d231c2dbce1eaa8141b9b127d88"
-dependencies = [
- "ppv-lite86",
- "rand_core",
-]
-
-[[package]]
-name = "rand_core"
-version = "0.6.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
-dependencies = [
- "getrandom",
 ]
 
 [[package]]

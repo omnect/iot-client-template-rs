@@ -1,5 +1,5 @@
 use anyhow::Result;
-use log::{debug, info};
+use log::{trace, info};
 use sd_notify::NotifyState;
 use std::sync::Once;
 use std::time::Instant;
@@ -18,37 +18,29 @@ pub struct WatchdogHandler {
     now: Option<Instant>,
 }
 
-impl Default for WatchdogHandler {
-    fn default() -> Self {
-        WatchdogHandler {
-            usec: u64::MAX,
-            now: None,
-        }
-    }
-}
-
 impl WatchdogHandler {
-    pub fn init(&mut self) -> Result<()> {
-        self.usec = u64::MAX;
+    pub fn new() -> Self {
+        let mut usec = u64::MAX;
+        let mut now = None;
 
-        if sd_notify::watchdog_enabled(false, &mut self.usec) {
-            self.usec /= 2;
-            self.now = Some(Instant::now());
+        if sd_notify::watchdog_enabled(false, &mut usec) {
+            usec /= 2;
+            now = Some(Instant::now());
         }
 
         info!(
             "watchdog settings: enabled: {} interval: {}µs",
-            self.now.is_some(),
-            self.usec
+            now.is_some(),
+            usec
         );
 
-        Ok(())
+        WatchdogHandler { usec, now }
     }
 
     pub fn notify(&mut self) -> Result<()> {
         if let Some(ref mut now) = self.now {
             if u128::from(self.usec) < now.elapsed().as_micros() {
-                debug!("notify watchdog=1");
+                trace!("notify watchdog=1");
                 sd_notify::notify(false, &[NotifyState::Watchdog])?;
                 *now = Instant::now();
             }
