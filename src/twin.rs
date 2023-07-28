@@ -61,12 +61,20 @@ impl Twin {
     ) -> Result<()> {
         info!("desired: {state:#?}, {desired}");
 
-        match state {
-            TwinUpdateState::Partial => {}
-            TwinUpdateState::Complete => {}
-        }
+        let desired = match state {
+            TwinUpdateState::Partial => &desired,
+            TwinUpdateState::Complete => &desired["desired"],
+        };
 
-        Ok(())
+        let mut map: serde_json::Map<String, serde_json::Value> =
+            serde_json::from_value(desired.to_owned()).unwrap();
+
+        map.remove("$version");
+
+        self.tx_reported_properties
+            .send(serde_json::Value::Object(map))
+            .await
+            .map_err(|err| err.into())
     }
 
     async fn handle_direct_method(
@@ -77,8 +85,30 @@ impl Twin {
         info!("handle_direct_method: {method_name} with payload: {payload}");
 
         match method_name.as_str() {
-            "closure_send_d2c_message" => Ok(None),
-            "func_echo_params_as_result" => Ok(None),
+            "closure_send_d2c_message" => {
+                let message = IotMessage::builder()
+                    .set_body(
+                        serde_json::to_vec(r#"{"my telemetry message": "hi from device"}"#)
+                            .unwrap(),
+                    )
+                    .set_id("my msg id")
+                    .set_correlation_id("my correleation id")
+                    .set_property("my property key", "my property value")
+                    .set_output_queue("my output queue")
+                    .build()
+                    .unwrap();
+
+                self.tx_outgoing_message.send(message).await?;
+                Ok(None)
+            }
+            "func_echo_params_as_result" => {
+                let out_json = json!({
+                    "called function": "mirror_func_params_as_result",
+                    "your param was": payload
+                });
+
+                Ok(Some(out_json))
+            }
             _ => Err(anyhow!("direct method unknown")),
         }
     }
@@ -98,7 +128,12 @@ impl Twin {
     }
 
     async fn handle_incoming_message(&mut self, message: IotMessage) -> Result<DispositionResult> {
-        info!("received message: {message:#?}");
+        info!(
+            "received C2D message with \n body: {:?}\n properties: {:?} \n system properties: {:?}",
+            std::str::from_utf8(&message.body).unwrap(),
+            message.properties,
+            message.system_properties
+        );
         Ok(DispositionResult::Accepted)
     }
 
