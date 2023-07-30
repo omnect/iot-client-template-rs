@@ -85,7 +85,7 @@ impl Twin {
         info!("handle_direct_method: {method_name} with payload: {payload}");
 
         match method_name.as_str() {
-            "closure_send_d2c_message" => {
+            "send_d2c_message" => {
                 let message = IotMessage::builder()
                     .set_body(
                         serde_json::to_vec(r#"{"my telemetry message": "hi from device"}"#)
@@ -101,7 +101,7 @@ impl Twin {
                 self.tx_outgoing_message.send(message).await?;
                 Ok(None)
             }
-            "func_echo_params_as_result" => {
+            "echo_params_as_result" => {
                 let out_json = json!({
                     "called function": "mirror_func_params_as_result",
                     "your param was": payload
