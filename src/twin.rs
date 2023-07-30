@@ -176,7 +176,7 @@ impl Twin {
                     Some(tx_connection_status.clone()),
                     Some(tx_twin_desired.clone()),
                     Some(tx_direct_method.clone()),
-                    None,
+                    Some(incoming_message_observer),
                 )
                 .await?
             }
@@ -184,7 +184,7 @@ impl Twin {
                 Some(tx_connection_status.clone()),
                 Some(tx_twin_desired.clone()),
                 Some(tx_direct_method.clone()),
-                None,
+                Some(incoming_message_observer),
             )?,
         };
 
