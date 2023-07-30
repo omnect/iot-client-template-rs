@@ -40,6 +40,13 @@ impl Twin {
                 if !self.authenticated_once {
                     systemd::notify_ready();
 
+                    self.tx_reported_properties
+                        .send(json!({
+                            "module-version": env!("CARGO_PKG_VERSION"),
+                            "azure-sdk-version": IotHubClient::sdk_version_string()
+                        }))
+                        .await?;
+
                     self.authenticated_once = true;
                 };
             }
