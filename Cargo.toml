@@ -1,10 +1,13 @@
 [package]
-name = "iot-client-template-rs"
-version = "0.5.0"
-edition = "2021"
 authors = ["omnect@conplement.de>"]
-repository = "git@github.com:omnect/iot-client-template-rs.git"
+edition = "2021"
+description = "This service demonstrates usage of omnect azure-iot-sdk."
+homepage = "https://www.omnect.io/home"
 license = "MIT OR Apache-2.0"
+name = "iot-client-template-rs"
+readme = "README.md"
+repository = "git@github.com:omnect/iot-client-template-rs.git"
+version = "0.5.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
