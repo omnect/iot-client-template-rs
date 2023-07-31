@@ -898,7 +898,6 @@ dependencies = [
  "futures-util",
  "log",
  "log-panics",
- "once_cell",
  "sd-notify",
  "serde_json",
  "tokio",
