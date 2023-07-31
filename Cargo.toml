@@ -9,14 +9,9 @@ readme = "README.md"
 repository = "git@github.com:omnect/iot-client-template-rs.git"
 version = "0.5.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 anyhow = "1.0"
-#azure-iot-sdk = { git = "https://github.com/omnect/azure-iot-sdk.git", tag = "0.10.0", features = [
-#   "module_client",
-#] }
-azure-iot-sdk = { git = "https://github.com/JanZachmann/azure-iot-sdk.git", branch = "async-api", features = [
+azure-iot-sdk = { git = "https://github.com/omnect/azure-iot-sdk.git", tag = "0.10.0", features = [
     "module_client",
 ] }
 env_logger = "0.8"
