@@ -46,19 +46,19 @@ The `systemd` feature is an optional feature which is enabled by default. If it 
 
 This project shows a basic skeleton for an initial implementation of a Rust based iot device client. It demonstrates how to make use of our Rust [azure-iot-sdk](https://github.com/omnect/azure-iot-sdk) in order to connect to Azure iot-hub. Moreover there are examples to show basic communication patterns:
 
-1. **Client**: [client.rs](src/client.rs) implements basic logic needed to communicate with iot-hub. Therefore the `EventHandler` trait is implemented in order to receive new desired properties, direct method calls or cloud to device (C2D) messages from iot-hub. Further the client provides a message channel to send reported properities and device to cloud messages (D2C) to iot-hub.
-2. **Twin properties**: [message.rs](src/message.rs) implements logic that demonstrates how the client twin can be utilized in applications. As an example desired properties are directly sent back as reported properties.
-3. **Direct methods**: [direct_methods.rs](src/direct_methods.rs) implements two functions that serve as direct method and can be synchronously called by iot-hub:
-   1. `closure_send_d2c_message`: A closure that doesn't take a parameter and doesn't return a result. The method triggers an outgoing D2C message (@see **3. D2C message**).
-   2. `func_echo_params_as_result`: A function that takes a parameter and returns the same parameter as result.
-4. **Device to cloud messages (D2C)**: In [direct_methods.rs](src/direct_methods.rs) there is a direct method call named `closure_send_d2c_message`. It shows how to send a D2C telemetry event to iot-hub.
-5. **Cloud to device messages (C2D)**: [message.rs](src/message.rs) demonstrates how the application receives messages sent from cloud. As an example the content of the received message is logged to the console. In order to test that functionality it is the easiest way to configure the application as `device_twin` and send a message from [iot-explorer](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer).
+1. **Initial setup**: `run()` in [twin.rs](src/twin.rs) implements basic logic to setup communication with iot-hub. Therefore the `IotHubClient` is instantiated in order to receive connection status, desired properties, direct method calls or cloud to device (C2D) messages from iot-hub. Further message channels are provided to send reported properties and device to cloud messages (D2C) to iot-hub.
+2. **Twin properties**: `handle_desired()` in [twin.rs](src/twin.rs) implements logic that demonstrates how the client twin can be utilized in applications. As an example desired properties are directly sent back as reported properties.
+3. **Direct methods**: `handle_direct_method()` in [twin.rs](src/twin.rs) implements two functions that serve as direct method:
+   1. `send_d2c_message`: A function that doesn't take a parameter and doesn't return a result. The method triggers an outgoing D2C message (@see **3. D2C message**).
+   2. `echo_params_as_result`: A function that takes a parameter and returns the same parameter as result.
+4. **Device to cloud messages (D2C)**: In [twin.rs](src/twin.rs) there is a direct method call named `send_d2c_message`. It shows how to send a D2C telemetry event to iot-hub.
+5. **Cloud to device messages (C2D)**: `handle_incoming_message()` in [twin.rs](src/twin.rs) demonstrates how the application receives messages sent from cloud. As an example the content of the received message is logged to the console. In order to test that functionality it is the easiest way to configure the application as `device_twin` and send a message from [iot-explorer](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer).
 
 All examples can be tested via [iot-explorer](https://docs.microsoft.com/en-us/azure/iot-pnp/howto-use-iot-explorer) or directly via iot-hub view in your Azure portal.
 
 # Platform integration
 
-Both of the supported omnect Device Management targets - [yocto](https://github.com/omnect/meta-omnect) and [simulator](https://github.com/omnect/simulator) - integrate the `iot-client-template-rs` and serve as an example for device integration.
+[meta-omnect](https://github.com/omnect/meta-omnect) integrates the `iot-client-template-rs` and serves as an example for device integration.
 
 # Client identity creation in Azure iot-hub
 
@@ -66,15 +66,10 @@ In order to enable the communication between client and cloud a device or module
 ***Note: This only applies to client types device_client and module_client (clients of type edge_client connect via edge runtime).***
 
 1. **Client identity creation on device via Azure Identity Service (AIS)**: In case your device integrates [AIS](https://azure.github.io/iot-identity-service/), the module creation will be managed automatically on demand. Omnect Device Management yocto layer and simulator support AIS by default.
-2. **Manual identity creation and connection string**: As an alternative you might create your device or modules manually in iot-hub and pass the corresponding connection string to the `client.run()` call in [lib.rs](src/lib.rs):
+2. **Manual identity creation and connection string**: As an alternative you might create your device or modules manually in iot-hub and pass the corresponding connection string to the `Twin::run` call in [main.rs](src/main.rs):
 
 ```
-   client.run(
-      Some("your connection string"),
-      Some(methods),
-      tx_client2app,
-      rx_app2client,
-   );
+   Twin::run(Some("your connection string"));
 ```
 # License
 

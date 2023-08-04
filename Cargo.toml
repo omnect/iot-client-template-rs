@@ -1,21 +1,24 @@
 [package]
-name = "iot-client-template-rs"
-version = "0.4.21"
-edition = "2021"
 authors = ["omnect@conplement.de>"]
-repository = "git@github.com:omnect/iot-client-template-rs.git"
+edition = "2021"
+description = "This service demonstrates usage of omnect azure-iot-sdk."
+homepage = "https://www.omnect.io/home"
 license = "MIT OR Apache-2.0"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+name = "iot-client-template-rs"
+readme = "README.md"
+repository = "git@github.com:omnect/iot-client-template-rs.git"
+version = "0.5.0"
 
 [dependencies]
 anyhow = "1.0"
-azure-iot-sdk = { git = "https://github.com/omnect/azure-iot-sdk.git", tag = "0.9.5", default-features = false }
+azure-iot-sdk = { git = "https://github.com/omnect/azure-iot-sdk.git", tag = "0.10.0", features = [
+    "module_client",
+] }
 env_logger = "0.8"
 futures-executor = "0.3"
+futures-util = "0.3"
 log = "0.4"
 log-panics = { version = "2", features = ["with-backtrace"] }
-once_cell = "1.17"
 sd-notify = { version = "0.4", optional = true }
 serde_json = "1.0"
 tokio = { version = "1", features = ["full"] }
