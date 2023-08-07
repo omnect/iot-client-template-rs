@@ -13,6 +13,7 @@ pub fn notify_ready() {
     });
 }
 
+#[derive(Default)]
 pub struct WatchdogHandler {
     usec: u64,
     now: Option<Instant>,

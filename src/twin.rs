@@ -26,8 +26,8 @@ impl Twin {
     ) -> Self {
         Twin {
             iothub_client: client,
-            tx_reported_properties: tx_reported_properties.clone(),
-            tx_outgoing_message: tx_outgoing_message.clone(),
+            tx_reported_properties,
+            tx_outgoing_message,
             authenticated_once: false,
         }
     }
