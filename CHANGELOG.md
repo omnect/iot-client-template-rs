@@ -6,7 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.5.2] Q3 2023
- - removed module_client feature from azure-iot-sdk to be able to reconfigure this dependency
+ - removed module_client feature from azure-iot-sdk to be able to
+   reconfigure this dependency e.g. as edge_client via cargo build
 
 ## [0.5.1] Q3 2023
  - fixed cargo clippy warnings
