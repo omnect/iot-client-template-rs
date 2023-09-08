@@ -7,13 +7,11 @@ license = "MIT OR Apache-2.0"
 name = "iot-client-template-rs"
 readme = "README.md"
 repository = "git@github.com:omnect/iot-client-template-rs.git"
-version = "0.5.1"
+version = "0.5.2"
 
 [dependencies]
 anyhow = "1.0"
-azure-iot-sdk = { git = "https://github.com/omnect/azure-iot-sdk.git", tag = "0.10.0", features = [
-    "module_client",
-] }
+azure-iot-sdk = { git = "https://github.com/omnect/azure-iot-sdk.git", tag = "0.10.0" }
 env_logger = "0.8"
 futures-executor = "0.3"
 futures-util = "0.3"
