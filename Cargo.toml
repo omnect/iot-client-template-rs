@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 name = "iot-client-template-rs"
 readme = "README.md"
 repository = "git@github.com:omnect/iot-client-template-rs.git"
-version = "0.5.2"
+version = "0.5.3"
 
 [dependencies]
 anyhow = "1.0"
