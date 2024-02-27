@@ -1,3 +1,4 @@
+# DEPRICATED
 # iot-client-template-rs
 Product page: https://www.omnect.io/home
 
